@@ -9,6 +9,32 @@ const {
   token,
 } = require('./config.js');
 
+timeout()
+async function timeout() {
+  setTimeout(function () {
+    if (Client.users.cache.find(user => user.bot == false)) {
+      Client.guilds.cache.forEach(canal => {
+        if (canal.name = 'galera de cowboy') {
+          canal.members.cache.forEach(u => {
+            if (u.user.bot == false && u.user.username == 'yuri') {
+              teste(u)
+            }
+          })
+        }
+      })
+      timeout();
+    }
+  }, 1000); // 30 * 60000 60000ms = 1min
+}
+
+async function teste(u) {
+  const connection = await u.voice.channel.join();
+  const dispatcher = connection.play('./audios/legal.mp3', { volume: getRandomVolume() });
+  dispatcher.on('finish', (k) => {
+    voiceChannel.leave();
+  });
+}
+
 Client.on('message', async message => {
   if (message.content.startsWith(prefix)) {
     execute(message);
@@ -82,7 +108,7 @@ const options = new Map([
       file: `${prefixAudio}/alek.mp3`,
     }
   ],
-    [
+  [
     'ohuhalek', {
       command: 'ohuhalek',
       description: 'alek destruindo na pista de danca',
@@ -97,7 +123,7 @@ const options = new Map([
       gif: `${prefixGifs}/bota.gif`
     }
   ],
-    [
+  [
     'cavalo', {
       command: 'cavalo',
       description: 'cavalo',
@@ -111,50 +137,57 @@ const options = new Map([
       file: `${prefixAudio}/massachusetts.mp3`,
     }
   ],
-   [
+  [
     'etsirt', {
       command: 'etsirt',
       description: '(: sassed aiciton amu moc etsirt tm ocif ue',
       file: `${prefixAudio}/etsirt.mp3`,
-       foto: `${prefixFoto}/etsirt.jpg`
+      foto: `${prefixFoto}/etsirt.jpg`
     }
   ],
-    [
+  [
     'oi', {
       command: 'oi',
       description: '(: oi linda, ai kawaii',
       file: `${prefixAudio}/KAWAII.mp3`,
     }
   ],
-    [
+  [
     'nicolas', {
       command: 'nicolas',
       description: '(: turugudum cha cha turugu cha turuudum cha cha',
       file: `${prefixAudio}/CAGEZINHO.mp3`,
     }
   ],
+  [
+    'glub', {
+      command: 'glub',
+      description: 'glub glub',
+      file: `${prefixAudio}/glub.mp3`,
+    }
+  ],
 ]);
 
 function vazei(channel) {
-  channel.send({files: [`${prefixFoto}/saifora.jpg`]})
+  channel.send({ files: [`${prefixFoto}/saifora.jpg`] })
 }
 
 const getDoc = (commands) => {
-    const description = `O bot reproduz audios e gifs.
+  const description = `O bot reproduz audios e gifs.
         O unico comando disponivel é \`${prefix} [option]\`, exemplo: \`${prefix} perdemo\`.
         **Comandos**:`;
 
-    const HEmbed = new MessageEmbed()
-        .setTitle(`Seguintes comandos disponíveis 📋:`)
-        .setColor('#4a3722')
-        .setDescription(description); 
+  const HEmbed = new MessageEmbed()
+    .setTitle(`Seguintes comandos disponíveis 📋:`)
+    .setColor('#4a3722')
+    .setDescription(description);
 
-    commands.forEach((value, key) => {
-        HEmbed.addField(`${prefix} ${value.command}`, value.description, false);
-    });
+  commands.forEach((value, key) => {
+    HEmbed.addField(`${prefix} ${value.command}`, value.description, false);
+  });
 
-    HEmbed.addField('help', 'Mostra a lista de comandos e opções', true);
-    return HEmbed;
+  HEmbed.addField('help', 'Mostra a lista de comandos e opções', true);
+  return HEmbed;
 };
 
 function getRandomVolume() {
