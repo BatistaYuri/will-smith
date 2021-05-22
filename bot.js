@@ -18,11 +18,11 @@ async function timeout() {
           canal.members.cache.forEach(u => {
             if (u.user.bot == false && u.user.username) {
               glub(u)
+              timeout();
             }
           })
         }
       })
-      timeout();
     }
   }, 30 * 60000); // 60000ms = 1min
 }
