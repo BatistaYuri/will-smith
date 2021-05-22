@@ -24,12 +24,12 @@ async function timeout() {
       })
       timeout();
     }
-  }, 1000); // 30 * 60000 60000ms = 1min
+  }, 60000); // 30 * 60000 60000ms = 1min
 }
 
 async function teste(u) {
   const connection = await u.voice.channel.join();
-  const dispatcher = connection.play('./audios/legal.mp3', { volume: getRandomVolume() });
+  const dispatcher = connection.play('./audios/glub.mp3', { volume: getRandomVolume() });
   dispatcher.on('finish', (k) => {
     voiceChannel.leave();
   });
