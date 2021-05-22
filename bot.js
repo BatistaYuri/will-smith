@@ -16,8 +16,8 @@ async function timeout() {
       Client.guilds.cache.forEach(canal => {
         if (canal.name = 'galera de cowboy') {
           canal.members.cache.forEach(u => {
-            if (u.user.bot == false && u.user.username == 'yuri') {
-              teste(u)
+            if (u.user.bot == false && u.user.username) {
+              glub(u)
             }
           })
         }
@@ -27,7 +27,7 @@ async function timeout() {
   }, 60000); // 30 * 60000 60000ms = 1min
 }
 
-async function teste(u) {
+async function glub(u) {
   const connection = await u.voice.channel.join();
   const dispatcher = connection.play('./audios/glub.mp3', { volume: getRandomVolume() });
   dispatcher.on('finish', (k) => {
