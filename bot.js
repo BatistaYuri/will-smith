@@ -14,7 +14,6 @@ async function timeout() {
   setTimeout(function () {
     if (Client.users.cache.find(user => user.bot == false)) {
       Client.guilds.cache.forEach(canal => {
-        canal.widgetChannel.send('/tts glub')
         if (canal.name = 'galera de cowboy') {
           canal.members.cache.forEach(u => {
             if (u.user.bot == false) {
@@ -37,6 +36,7 @@ async function glub(u) {
 }
 
 Client.on('message', async message => {
+  console.log('message')
   if (message.content.startsWith(prefix)) {
     execute(message);
   }
