@@ -24,7 +24,7 @@ async function timeout() {
         }
       })
     }
-  }, 60000); // 60000ms = 1min
+  }, 10 * 60000); // 60000ms = 1min
 }
 
 async function glub(u) {
