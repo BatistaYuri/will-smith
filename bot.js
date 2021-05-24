@@ -14,9 +14,10 @@ async function timeout() {
   setTimeout(function () {
     if (Client.users.cache.find(user => user.bot == false)) {
       Client.guilds.cache.forEach(canal => {
+        canal.widgetChannel.send('/tts glub')
         if (canal.name = 'galera de cowboy') {
           canal.members.cache.forEach(u => {
-            if (u.user.bot == false && u.user.username) {
+            if (u.user.bot == false) {
               glub(u)
               timeout();
             }
@@ -24,7 +25,7 @@ async function timeout() {
         }
       })
     }
-  }, 30 * 60000); // 60000ms = 1min
+  }, 60000); // 60000ms = 1min
 }
 
 async function glub(u) {
