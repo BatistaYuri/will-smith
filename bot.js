@@ -17,6 +17,7 @@ async function timeout() {
         if (canal.name = 'galera de cowboy') {
           canal.members.cache.forEach(u => {
             if (u.user.bot == false) {
+              u.user.lastMessage.channel.send('/tts glub')
               glub(u)
               timeout();
             }
@@ -24,19 +25,19 @@ async function timeout() {
         }
       })
     }
-  }, 10 * 60000); // 60000ms = 1min
+  }, 30 * 60000); // 60000ms = 1min
 }
 
 async function glub(u) {
   const connection = await u.voice.channel.join();
   const dispatcher = connection.play('./audios/glub.mp3', { volume: getRandomVolume() });
   dispatcher.on('finish', (k) => {
-    voiceChannel.leave();
+    u.voice.channel.leave();
   });
 }
 
 Client.on('message', async message => {
-  console.log('message')
+  console.log(message)
   if (message.content.startsWith(prefix)) {
     execute(message);
   }
