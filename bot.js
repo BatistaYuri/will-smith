@@ -9,8 +9,8 @@ const {
   token,
 } = require('./config.js');
 
-timeout()
-async function timeout() {
+glubTimeout()
+async function glubTimeout() {
   setTimeout(function () {
     if (Client.users.cache.find(user => user.bot == false)) {
       Client.guilds.cache.forEach(canal => {
@@ -19,7 +19,7 @@ async function timeout() {
             if (u.user.bot == false) {
               u.user.lastMessage.channel.send('/tts glub')
               glub(u)
-              timeout();
+              glubTimeout();
             }
           })
         }
@@ -37,7 +37,6 @@ async function glub(u) {
 }
 
 Client.on('message', async message => {
-  console.log(message)
   if (message.content.startsWith(prefix)) {
     execute(message);
   }
