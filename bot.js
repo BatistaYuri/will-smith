@@ -8,6 +8,7 @@ const {
   prefix,
   token,
 } = require('./config.js');
+const cron = require("node-cron");
 
 //-----------------------------------//
 
@@ -18,6 +19,27 @@ Client.on('message', async message => {
     execute(message);
   }
 });
+
+Client.on('ready', () => {
+  console.log('Connected');
+  Client.channels.fetch("679831039522373635")
+    .then(async alisson => {
+      cron.schedule("*/30 * * * * ", async () => {
+        glub(alisson);
+      }, {
+          scheduled: true,
+          timezone: "America/Sao_Paulo"
+        });
+    });
+});
+
+async function glub(voice_channel) {
+  const connection = await voice_channel.join();
+  const dispatcher = connection.play('./audios/glub.mp3', { volume: getRandomVolume() });
+      dispatcher.on('finish', (k) => {
+        voice_channel.leave();
+      });
+}
 
 const prefixAudio = './audios';
 const prefixGifs = './gifs';
