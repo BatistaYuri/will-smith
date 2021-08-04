@@ -36,9 +36,9 @@ Client.on('ready', () => {
 async function glub(voice_channel) {
   const connection = await voice_channel.join();
   const dispatcher = connection.play('./audios/glub.mp3', { volume: getRandomVolume() });
-      dispatcher.on('finish', (k) => {
-        voice_channel.leave();
-      });
+  dispatcher.on('finish', (k) => {
+    voice_channel.leave();
+  });
 }
 
 const prefixAudio = './audios';
@@ -164,6 +164,20 @@ const options = new Map([
       command: 'glub',
       description: 'glub glub',
       file: `${prefixAudio}/glub.mp3`,
+    }
+  ],
+    [
+    'an', {
+      command: 'an',
+      description: 'ãn',
+      file: `${prefixAudio}/an.mp3`,
+    }
+  ],
+    [
+    'yamete', {
+      command: 'yamete',
+      description: 'yamete Kudasai',
+      file: `${prefixAudio}/yamete.mp3`,
     }
   ],
 ]);
