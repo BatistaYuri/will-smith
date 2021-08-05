@@ -1,3 +1,12 @@
 {
-  "files": {}
+  "files": {
+    "bot.js": [
+      {
+        "id": "2393adeb-14e5-4f26-8d35-c8aec3ece595",
+        "line": 302,
+        "version": 1423,
+        "index": 7119
+      }
+    ]
+  }
 }

@@ -283,12 +283,11 @@ Client.login(token);
 //-----------------------LOL-----------------------//
 
 app.use(json());
-app.use(cors());
+app.use(cors());true
 app.listen(process.env.PORT || 3333);
-let emPartida = false
+let emPartida = true
 
 async function lol(voice_channel){
-  console.log(emPartida)
   const request = await axios
     .get(
       `https://br1.api.riotgames.com/lol/spectator/v4/active-games/by-summoner/-cmAZPGDptxynWp7-PBmSoilLc_fJbqAvS9XrAdovkX2bA`,
@@ -297,13 +296,14 @@ async function lol(voice_channel){
     .then((e) => {
       if(e.status == 200){
         emPartida = true 
-      }else{
+      }
+    }).catch((err) => {
         if(emPartida == true){
           emPartida = false
           getPartida(voice_channel)
         } 
-      }
-    }).catch((err) => console.log(err));
+    }
+    );
 }
 
 async function getPartida(voice_channel){
@@ -313,8 +313,7 @@ async function getPartida(voice_channel){
       { headers: { "X-Riot-Token": process.env.LOL_KEY } }
     ).then((e) =>{
       if(e.status == 200){
-        getVitoria(e.data.matches[0], voice_channel)
-
+        getVitoria(e.data.matches[0].gameId, voice_channel)
       }
     })
 }
@@ -328,7 +327,6 @@ async function getVitoria(gameId, voice_channel){
     ).then((e) =>{
       if(e.status == 200){
         participante = e.data.participantIdentities.find(participante => participante.player.summonerName = "Baixo")
-        console.log(participante)
         if(participante.participantId < 6){
           teamId = 100
         }else{
