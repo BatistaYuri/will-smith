@@ -9,6 +9,12 @@ const {
   token,
 } = require('./config.js');
 const cron = require("node-cron");
+const express = require("express");
+const { json } = require("express");
+require("dotenv").config();
+const axios = require("axios");
+const cors = require("cors");
+const app = express();
 
 //-----------------------------------//
 
@@ -31,13 +37,20 @@ Client.on('ready', () => {
           timezone: "America/Sao_Paulo"
         });
     });
+  Client.channels.fetch("679831039522373635")
+    .then(async alisson => {
+      cron.schedule("*/10 * * * * * ", async () => {
+        lol(alisson);
+      }, {
+          scheduled: true,
+          timezone: "America/Sao_Paulo"
+        });
+    });
 });
 
 async function glub(voice_channel) {
   const connection = await voice_channel.join();
-  audios = ["glub", "an", "yamete"]
-  const randomElement = Math.floor(Math.random() * months.length);
-  const dispatcher = connection.play(`./audios/${audios[randomElement]}.mp3`, { volume: getRandomVolume() });
+  const dispatcher = connection.play(`./audios/glub.mp3`, { volume: getRandomVolume() });
   dispatcher.on('finish', (k) => {
     voice_channel.leave();
   });
@@ -259,3 +272,87 @@ async function execute(message) {
 }
 
 Client.login(token);
+
+//-----------------------LOL-----------------------//
+
+app.use(json());
+app.use(cors());
+app.listen(process.env.PORT || 3333);
+let emPartida = false
+
+async function lol(voice_channel){
+  console.log(emPartida)
+  const request = await axios
+    .get(
+      `https://br1.api.riotgames.com/lol/spectator/v4/active-games/by-summoner/-cmAZPGDptxynWp7-PBmSoilLc_fJbqAvS9XrAdovkX2bA`,
+      { headers: { "X-Riot-Token": process.env.LOL_KEY } }
+    )
+    .then((e) => {
+      if(e.status == 200){
+        emPartida = true 
+      }else{
+        if(emPartida == true){
+          matches()
+        }
+        emPartida = false 
+      }
+    });
+}
+
+async function getPartida(voice_channel){
+  const request = await axios
+    .get(
+      `https://br1.api.riotgames.com/lol/match/v4/matchlists/by-account/hPUjLayREAsin3ZzDGTSrShVJPqBc8_G5ws4Wf3_bXjnlf0`,
+      { headers: { "X-Riot-Token": process.env.LOL_KEY } }
+    ).then((e) =>{
+      if(e.status == 200){
+        getVitoria(e.data.matches[0], voice_channel)
+
+      }
+    })
+}
+
+async function getVitoria(gameId, voice_channel){
+  let teamId = 0
+  const request = await axios
+    .get(
+      `https://br1.api.riotgames.com/lol/match/v4/matches/${gameId}`,
+      { headers: { "X-Riot-Token": process.env.LOL_KEY } }
+    ).then((e) =>{
+      if(e.status == 200){
+        participante = e.data.participantIdentities.find(participante => participante.player.summonerName = "Baixo")
+        console.log(participante)
+        if(participante.participantId < 6){
+          teamId = 100
+        }else{
+          teamId = 200
+        }
+        let win = e.data.teams.find(team => team.teamId == teamId).win
+        if(win == "Win"){
+          empatamo('perdemo')
+        }else{
+          perdemo('empatamo')
+        }
+      }
+    })
+}
+
+async function perdemo(voice_channel) {
+  const connection = await voice_channel.join();
+  const dispatcher = connection.play(`./audios/perdemo.mp3`, { volume: getRandomVolume() });
+  dispatcher.on('finish', (k) => {
+    voice_channel.leave();
+  });
+}
+
+async function empatamo(voice_channel) {
+  const connection = await voice_channel.join();
+  const dispatcher = connection.play(`./audios/empatamo.mp3`, { volume: getRandomVolume() });
+  dispatcher.on('finish', (k) => {
+    voice_channel.leave();
+  });
+}
+
+
+
+
