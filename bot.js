@@ -303,7 +303,7 @@ async function lol(voice_channel){
           getPartida(voice_channel)
         } 
       }
-    });
+    }).catch((err) => console.log(err));
 }
 
 async function getPartida(voice_channel){
