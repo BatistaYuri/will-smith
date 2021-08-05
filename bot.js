@@ -299,9 +299,9 @@ async function lol(voice_channel){
         emPartida = true 
       }else{
         if(emPartida == true){
-          matches()
-        }
-        emPartida = false 
+          emPartida = false
+          getPartida(voice_channel)
+        } 
       }
     });
 }
@@ -336,9 +336,9 @@ async function getVitoria(gameId, voice_channel){
         }
         let win = e.data.teams.find(team => team.teamId == teamId).win
         if(win == "Win"){
-          empatamo('perdemo')
+          empatamo(voice_channel)
         }else{
-          perdemo('empatamo')
+          perdemo(voice_channel)
         }
       }
     })
