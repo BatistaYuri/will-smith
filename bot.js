@@ -181,18 +181,25 @@ const options = new Map([
       file: `${prefixAudio}/glub.mp3`,
     }
   ],
-    [
+  [
     'an', {
       command: 'an',
       description: 'ãn',
       file: `${prefixAudio}/an.mp3`,
     }
   ],
-    [
+  [
     'yamete', {
       command: 'yamete',
       description: 'yamete Kudasai',
       file: `${prefixAudio}/yamete.mp3`,
+    }
+  ],
+  [
+    'fdp', {
+      command: 'fdp',
+      description: 'iiui',
+      file: `${prefixAudio}/fdp.mp3`,
     }
   ],
 ]);
