@@ -37,15 +37,15 @@ Client.on('ready', () => {
           timezone: "America/Sao_Paulo"
         });
     });
-//  Client.channels.fetch("679831039522373635")
-//    .then(async alisson => {
-//      cron.schedule("*/10 * * * * * ", async () => {
-//        lol(alisson);
-//      }, {
-//          scheduled: true,
-//          timezone: "America/Sao_Paulo"
-//        });
-//    });
+  Client.channels.fetch("679831039522373635")
+    .then(async alisson => {
+      cron.schedule("*/10 * * * * * ", async () => {
+        lol(alisson);
+      }, {
+          scheduled: true,
+          timezone: "America/Sao_Paulo"
+        });
+    });
 });
 
 async function glub(voice_channel) {
@@ -285,9 +285,10 @@ Client.login(token);
 app.use(json());
 app.use(cors());true
 app.listen(process.env.PORT || 3333);
-let emPartida = false
+let emPartida = true
 
 async function lol(voice_channel){
+  console.log('emPartida = ' + emPartida)
   const request = await axios
     .get(
       `https://br1.api.riotgames.com/lol/spectator/v4/active-games/by-summoner/-cmAZPGDptxynWp7-PBmSoilLc_fJbqAvS9XrAdovkX2bA`,
@@ -298,6 +299,7 @@ async function lol(voice_channel){
         emPartida = true 
       }
     }).catch((err) => {
+      console.log("estou")
         if(emPartida == true){
           emPartida = false
           getPartida(voice_channel)
