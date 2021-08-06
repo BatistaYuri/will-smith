@@ -299,7 +299,6 @@ async function lol(voice_channel){
         emPartida = true 
       }
     }).catch((err) => {
-      console.log("estou")
         if(emPartida == true){
           emPartida = false
           getPartida(voice_channel)
