@@ -327,7 +327,7 @@ async function getVitoria(gameId, voice_channel){
       { headers: { "X-Riot-Token": process.env.LOL_KEY } }
     ).then((e) =>{
       if(e.status == 200){
-        participante = e.data.participantIdentities.find(participante => participante.player.summonerName = "Baixo")
+        participante = e.data.participantIdentities.find(participante => participante.player.summonerName == "Baixo")
         if(participante.participantId < 6){
           teamId = 100
         }else{
