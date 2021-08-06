@@ -285,7 +285,7 @@ Client.login(token);
 app.use(json());
 app.use(cors());true
 app.listen(process.env.PORT || 3333);
-let emPartida = true
+let emPartida = false
 
 async function lol(voice_channel){
   console.log('emPartida = ' + emPartida)
