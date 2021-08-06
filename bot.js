@@ -37,15 +37,15 @@ Client.on('ready', () => {
           timezone: "America/Sao_Paulo"
         });
     });
-  Client.channels.fetch("679831039522373635")
-    .then(async alisson => {
-      cron.schedule("*/10 * * * * * ", async () => {
-        lol(alisson);
-      }, {
-          scheduled: true,
-          timezone: "America/Sao_Paulo"
-        });
-    });
+  //Client.channels.fetch("679831039522373635")
+  //  .then(async alisson => {
+  //    cron.schedule("*/10 * * * * * ", async () => {
+  //     lol(alisson);
+  //    }, {
+  //        scheduled: true,
+  //        timezone: "America/Sao_Paulo"
+  //      });
+  //  });
 });
 
 async function glub(voice_channel) {
