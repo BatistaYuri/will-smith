@@ -19,7 +19,6 @@ const app = express();
 //-----------------------------------//
 
 //-----------------------------------//
-
 Client.on('message', async message => {
   if (message.content.startsWith(prefix)) {
     execute(message);
@@ -37,15 +36,15 @@ Client.on('ready', () => {
           timezone: "America/Sao_Paulo"
         });
     });
-  //Client.channels.fetch("679831039522373635")
-  //  .then(async alisson => {
-  //    cron.schedule("*/10 * * * * * ", async () => {
-  //     lol(alisson);
-  //    }, {
-  //        scheduled: true,
-  //        timezone: "America/Sao_Paulo"
-  //      });
-  //  });
+  Client.channels.fetch("679831039522373635")
+    .then(async alisson => {
+      cron.schedule("* * * * *", async () => {
+       lol(alisson);
+      }, {
+          scheduled: true,
+          timezone: "America/Sao_Paulo"
+        });
+    });
 });
 
 async function glub(voice_channel) {
@@ -202,6 +201,28 @@ const options = new Map([
       file: `${prefixAudio}/fdp.mp3`,
     }
   ],
+    [
+    'ganhamo', {
+      command: 'ganhamo',
+      description: 'ganhamo',
+      file: `${prefixAudio}/ganhamo.mp3`,
+      gif: `${prefixGifs}/ganhamo.gif`
+    }
+  ],
+    [
+    'derrota', {
+      command: 'derrota',
+      description: 'derrota',
+      file: `${prefixAudio}/derrota.mp3`,
+    }
+  ],
+    [
+    'é ele', {
+      command: 'é ele',
+      description: 'caralho will smith?',
+      file: `${prefixAudio}/é ele.mp3`,
+    }
+  ],
 ]);
 
 function vazei(channel) {
@@ -291,7 +312,7 @@ async function lol(voice_channel){
   console.log('emPartida = ' + emPartida)
   const request = await axios
     .get(
-      `https://br1.api.riotgames.com/lol/spectator/v4/active-games/by-summoner/-cmAZPGDptxynWp7-PBmSoilLc_fJbqAvS9XrAdovkX2bA`,
+      `https://br1.api.riotgames.com/lol/spectator/v4/active-games/by-summoner/J8GMaoFcrUNpTpcYjmt08szBZxmDfeqZec9EKIxgCkyvHw`,
       { headers: { "X-Riot-Token": process.env.LOL_KEY } }
     )
     .then((e) => {
@@ -310,7 +331,7 @@ async function lol(voice_channel){
 async function getPartida(voice_channel){
   const request = await axios
     .get(
-      `https://br1.api.riotgames.com/lol/match/v4/matchlists/by-account/hPUjLayREAsin3ZzDGTSrShVJPqBc8_G5ws4Wf3_bXjnlf0`,
+      `https://br1.api.riotgames.com/lol/match/v4/matchlists/by-account/FjIzcp0ibFNuSWABwOc5Sn-TeD2wX8a3-GfJw2KyO0uHm1U`,
       { headers: { "X-Riot-Token": process.env.LOL_KEY } }
     ).then((e) =>{
       if(e.status == 200){
@@ -327,7 +348,7 @@ async function getVitoria(gameId, voice_channel){
       { headers: { "X-Riot-Token": process.env.LOL_KEY } }
     ).then((e) =>{
       if(e.status == 200){
-        participante = e.data.participantIdentities.find(participante => participante.player.summonerName == "Baixo")
+        participante = e.data.participantIdentities.find(participante => participante.player.summonerName == "Ticamenes")
         if(participante.participantId < 6){
           teamId = 100
         }else{
@@ -335,28 +356,25 @@ async function getVitoria(gameId, voice_channel){
         }
         let win = e.data.teams.find(team => team.teamId == teamId).win
         if(win == "Win"){
-          empatamo(voice_channel)
+          audio(`./audios/ganhamo.mp3`, `gifs/ganhamo.gif`)
         }else{
-          perdemo(voice_channel)
+          audio(`./audios/perdemo.mp3`, `gifs/perdemo.gif`)
         }
       }
     })
 }
 
-async function perdemo(voice_channel) {
+async function audio(audio, gif) {
   const connection = await voice_channel.join();
-  const dispatcher = connection.play(`./audios/perdemo.mp3`, { volume: getRandomVolume() });
+  const dispatcher = connection.play(audio, { volume: getRandomVolume() });
   dispatcher.on('finish', (k) => {
     voice_channel.leave();
   });
-}
+  Client.channels.fetch("679831038796628048").then(async geral => {
+    return geral.send({ files: [gif] });
+  })
+  
 
-async function empatamo(voice_channel) {
-  const connection = await voice_channel.join();
-  const dispatcher = connection.play(`./audios/empatamo.mp3`, { volume: getRandomVolume() });
-  dispatcher.on('finish', (k) => {
-    voice_channel.leave();
-  });
 }
 
 
