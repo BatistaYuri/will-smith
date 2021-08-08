@@ -49,7 +49,9 @@ Client.on('ready', () => {
 
 async function glub(voice_channel) {
   const connection = await voice_channel.join();
-  const dispatcher = connection.play(`./audios/glub.mp3`, { volume: getRandomVolume() });
+  const audios = [`./audios/glub.mp3`, `./audios/an.mp3`, `./audios/yamete.mp3`, `./audios/fdp.mp3`]
+  const audio = Math.floor(Math.random() * audios.length);
+  const dispatcher = connection.play(audios[audio], { volume: getRandomVolume() });
   dispatcher.on('finish', (k) => {
     voice_channel.leave();
   });
