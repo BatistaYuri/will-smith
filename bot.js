@@ -358,15 +358,15 @@ async function getVitoria(gameId, voice_channel){
         }
         let win = e.data.teams.find(team => team.teamId == teamId).win
         if(win == "Win"){
-          audio(`./audios/ganhamo.mp3`, `gifs/ganhamo.gif`)
+          audio(`./audios/ganhamo.mp3`, `gifs/ganhamo.gif`, voice_channel)
         }else{
-          audio(`./audios/perdemo.mp3`, `gifs/perdemo.gif`)
+          audio(`./audios/perdemo.mp3`, `gifs/perdemo.gif`, voice_channel)
         }
       }
     })
 }
 
-async function audio(audio, gif) {
+async function audio(audio, gif, voice_channel) {
   const connection = await voice_channel.join();
   const dispatcher = connection.play(audio, { volume: getRandomVolume() });
   dispatcher.on('finish', (k) => {
