@@ -219,10 +219,10 @@ const options = new Map([
     }
   ],
     [
-    'é ele', {
-      command: 'é ele',
+    'éele', {
+      command: 'éele',
       description: 'caralho will smith?',
-      file: `${prefixAudio}/é ele.mp3`,
+      file: `${prefixAudio}/eele.mp3`,
     }
   ],
 ]);
