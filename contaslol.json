@@ -1,0 +1,35 @@
+{
+  "contas": 
+  [
+    {
+      "name": "Ticamenes",
+      "id": "J8GMaoFcrUNpTpcYjmt08szBZxmDfeqZec9EKIxgCkyvHw",
+      "accountId": "FjIzcp0ibFNuSWABwOc5Sn-TeD2wX8a3-GfJw2KyO0uHm1U",
+      "discord": "@yuri"
+    },
+    {
+      "name": "Baixo",
+      "id": "-cmAZPGDptxynWp7-PBmSoilLc_fJbqAvS9XrAdovkX2bA",
+      "accountId": "hPUjLayREAsin3ZzDGTSrShVJPqBc8_G5ws4Wf3_bXjnlf0",
+      "discord": "@Baixo"
+    },
+    {
+      "name": "FlyingCarrot",
+      "id": "AxsRNupFaeKCXUEj0_1XpWKmB4vvZeuNgrOffkC0PTux",
+      "accountId": "1wy8I-aduW6ebfHKsHqkESd1NLE7nrmtTo6KpnWXP7I",
+      "discord": "@Carrot"
+    },
+        {
+      "name": "Ahmunrah",
+      "id": "o8OB4KRd1ikBNuIjQBX5NfrDHS-gEp_8ldKVltOdcdK00A",
+      "accountId": "G9ydG4zQ96kI1lyBir9_hdtohXH2hXdizhtP-8Q1NbMqoEE",
+      "discord": "@Pedro Paulo"
+    },
+        {
+      "name": "zusflee",
+      "id": "mWfUPYWKMd3kNfyqX6AZU5xQPxtH7jbsFi2daazN8qUhWGg",
+      "accountId": "zSMMSMrtSd0tlqksPSbiyRFO4jfqLkkTbWARCBSVsVkM0bbglH_kSNln",
+      "discord": "@martinsleo"
+    }
+  ]
+}

@@ -308,13 +308,16 @@ Client.login(token);
 app.use(json());
 app.use(cors());true
 app.listen(process.env.PORT || 3333);
+const data = require('./contaslol.json')
 let emPartida = false
+let count = 0
+let jogador = data.contas[count]
 
 async function lol(voice_channel){
   console.log('emPartida = ' + emPartida)
   const request = await axios
     .get(
-      `https://br1.api.riotgames.com/lol/spectator/v4/active-games/by-summoner/J8GMaoFcrUNpTpcYjmt08szBZxmDfeqZec9EKIxgCkyvHw`,
+      `https://br1.api.riotgames.com/lol/spectator/v4/active-games/by-summoner/${jogador.id}`,
       { headers: { "X-Riot-Token": process.env.LOL_KEY } }
     )
     .then((e) => {
@@ -325,7 +328,16 @@ async function lol(voice_channel){
         if(emPartida == true){
           emPartida = false
           getPartida(voice_channel)
-        } 
+        }else{
+          // gambiarra (1 da manha, to com preguiça)
+          if(count == 4){
+            count = 0
+            jogador = data.contas[count]
+          }else{
+            count = count + 1
+            jogador = data.contas[count]
+          }
+        }
     }
     );
 }
@@ -333,7 +345,7 @@ async function lol(voice_channel){
 async function getPartida(voice_channel){
   const request = await axios
     .get(
-      `https://br1.api.riotgames.com/lol/match/v4/matchlists/by-account/FjIzcp0ibFNuSWABwOc5Sn-TeD2wX8a3-GfJw2KyO0uHm1U`,
+      `https://br1.api.riotgames.com/lol/match/v4/matchlists/by-account/${jogador.accountId}`,
       { headers: { "X-Riot-Token": process.env.LOL_KEY } }
     ).then((e) =>{
       if(e.status == 200){
@@ -350,29 +362,36 @@ async function getVitoria(gameId, voice_channel){
       { headers: { "X-Riot-Token": process.env.LOL_KEY } }
     ).then((e) =>{
       if(e.status == 200){
-        participante = e.data.participantIdentities.find(participante => participante.player.summonerName == "Ticamenes")
+        participante = e.data.participantIdentities.find(participante => participante.player.summonerName == jogador.name)
         if(participante.participantId < 6){
           teamId = 100
         }else{
           teamId = 200
         }
+        let jogadores =[]
+        data.contas.forEach(jogador =>{
+          jogadores.push(
+            e.data.participantIdentities.find(participante => participante.player.summonerName == jogador.name).discord)
+        })
         let win = e.data.teams.find(team => team.teamId == teamId).win
+
         if(win == "Win"){
-          audio(`./audios/ganhamo.mp3`, `gifs/ganhamo.gif`, voice_channel)
+          audio(`./audios/ganhamo.mp3`, `gifs/ganhamo.gif`, voice_channel, jogadores)
         }else{
-          audio(`./audios/perdemo.mp3`, `gifs/perdemo.gif`, voice_channel)
+          audio(`./audios/perdemo.mp3`, `gifs/perdemo.gif`, voice_channel, jogadores)
         }
       }
     })
 }
 
-async function audio(audio, gif, voice_channel) {
+async function audio(audio, gif, voice_channel, jogadores) {
   const connection = await voice_channel.join();
   const dispatcher = connection.play(audio, { volume: getRandomVolume() });
   dispatcher.on('finish', (k) => {
     voice_channel.leave();
   });
   Client.channels.fetch("679831038796628048").then(async geral => {
+    geral.send(jogadores + ' mamou');
     return geral.send({ files: [gif] });
   })
   
