@@ -309,7 +309,7 @@ app.use(json());
 app.use(cors());true
 app.listen(process.env.PORT || 3333);
 const data = require('./contaslol.json')
-let emPartida = false
+let emPartida = true
 let count = 0
 let jogador = data.contas[count]
 
@@ -329,7 +329,7 @@ async function lol(voice_channel){
           emPartida = false
           getPartida(voice_channel)
         }else{
-          // gambiarra (1 da manha, to com preguiça)
+          // gambiarra (2 da manha, to com preguiça)
           if(count == 4){
             count = 0
             jogador = data.contas[count]
@@ -351,7 +351,10 @@ async function getPartida(voice_channel){
       if(e.status == 200){
         getVitoria(e.data.matches[0].gameId, voice_channel)
       }
-    })
+    }).catch((err) => {
+        console.log(err)
+    }
+    );
 }
 
 async function getVitoria(gameId, voice_channel){
@@ -369,12 +372,13 @@ async function getVitoria(gameId, voice_channel){
           teamId = 200
         }
         let jogadores =[]
-        data.contas.forEach(jogador =>{
-          jogadores.push(
-            e.data.participantIdentities.find(participante => participante.player.summonerName == jogador.name).discord)
+        e.data.participantIdentities.forEach(participante =>{
+          let player = data.contas.find(jogador => participante.player.summonerName == jogador.name)
+          if(player){
+            jogadores.push(player.discord)
+          }
         })
         let win = e.data.teams.find(team => team.teamId == teamId).win
-
         if(win == "Win"){
           audio(`./audios/ganhamo.mp3`, `gifs/ganhamo.gif`, voice_channel, jogadores)
         }else{
@@ -385,19 +389,23 @@ async function getVitoria(gameId, voice_channel){
 }
 
 async function audio(audio, gif, voice_channel, jogadores) {
+  let mamadores = []
+  //gambiarra, pq sou um inutil, find() não funciou por algum motivo vsf javascripto
+  Client.users.cache.forEach(user =>{
+    jogadores.forEach(jogador =>{
+      if(jogador == user.username){
+        mamadores.push(`<@${user.id}>`)
+      }
+    })
+  })
+  // ADICIONAR ID DO DISCORD NO CONTASLOL
   const connection = await voice_channel.join();
   const dispatcher = connection.play(audio, { volume: getRandomVolume() });
   dispatcher.on('finish', (k) => {
     voice_channel.leave();
   });
   Client.channels.fetch("679831038796628048").then(async geral => {
-    geral.send(jogadores + ' mamou');
+    geral.send(mamadores.join(' ') + ' mamou');
     return geral.send({ files: [gif] });
   })
-  
-
 }
-
-
-
-

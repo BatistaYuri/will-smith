@@ -2,34 +2,39 @@
   "contas": 
   [
     {
+      "id": "Tno7jIPJu0ISJfDa04qtnGT8xbhZwqTjDqmsZJzU5VZr0Q",
+      "accountId": "BJaExj9ZZnfyjufh0tUq16XGUnKz8ZQ7tnIh69K8bHYVkyk",
+      "puuid": "pFQQ_7hEMwy22IY8KsfPsNDrQZiFEW2YioJiTVwzVP0mVMIesP5ILHsoJuF2dUusQ70AAzlbeIvKxw",
       "name": "Ticamenes",
-      "id": "J8GMaoFcrUNpTpcYjmt08szBZxmDfeqZec9EKIxgCkyvHw",
-      "accountId": "FjIzcp0ibFNuSWABwOc5Sn-TeD2wX8a3-GfJw2KyO0uHm1U",
-      "discord": "@yuri"
+      "discord": "yuri"
     },
     {
+      "id": "B5xmqHs4x-nURytbntLqtKAs8Shj23TxGTrvqwz4Bk_R-g",
+      "accountId": "A-Ci_RR6RAJv5fBVHwoqa3iY6GsAWnpsjC4H9LMiw38y0yU",
+      "puuid": "UFzw3_ImA1_jdPKM0A1RIVmhpmp1qFnp9J5T0fg7TowZJpNFdlJAsZAu8S6K_Nhtpdyuk5vdOCkZdQ",
       "name": "Baixo",
-      "id": "-cmAZPGDptxynWp7-PBmSoilLc_fJbqAvS9XrAdovkX2bA",
-      "accountId": "hPUjLayREAsin3ZzDGTSrShVJPqBc8_G5ws4Wf3_bXjnlf0",
-      "discord": "@Baixo"
+      "discord": "Baixo"
     },
     {
+      "id": "3RtSo-rD6Ccd7golcJ2EdtiDB8GQ0WE-n_MtzA3AELSI",
+      "accountId": "AXdlT_m7UDnJOpevqWaTZlXPBFdt_BYOVY0xRHbI2vo",
+      "puuid": "hdIiW5c69qtguwT8bA9z12C3BD10Z4avLdPc3kEIx6d9vZY9e23qHwzMyyyYbpX1M0jDe0W-Bk-EcQ",
       "name": "FlyingCarrot",
-      "id": "AxsRNupFaeKCXUEj0_1XpWKmB4vvZeuNgrOffkC0PTux",
-      "accountId": "1wy8I-aduW6ebfHKsHqkESd1NLE7nrmtTo6KpnWXP7I",
-      "discord": "@Carrot"
+      "discord": "Carrot"
     },
         {
+      "id": "3QWCcA9HHp-R6qxlBItMlOFGMWX6h1xIX-gYn5ezhtIi5g",
+      "accountId": "k-jM7ntO_QIGAF9z1DlnUFYsq3_Tr7i5SiZhRiT7rP-39FA",
+      "puuid": "fLdfrQdgy7zVPdxbQ9TXx4EATBbkiERpSsMFpyCzXFh2wpRiOm4NWhBz7O4IVWV7CkMdOG1IVNNY4A",
       "name": "Ahmunrah",
-      "id": "o8OB4KRd1ikBNuIjQBX5NfrDHS-gEp_8ldKVltOdcdK00A",
-      "accountId": "G9ydG4zQ96kI1lyBir9_hdtohXH2hXdizhtP-8Q1NbMqoEE",
-      "discord": "@Pedro Paulo"
+      "discord": "Pedro Paulo"
     },
         {
+      "id": "R67kCF6cTvT-ZEbcsTo17DztWbigqghnd84Gx10niWDojcQ",
+      "accountId": "2D42Kn8yiDcgUZFRH-F7lc7UDc3zudnP-9HFTRjlyVTT-zGwlactrsAm",
+      "puuid": "YessXVqpSJhZ7x26GnxwNOsefSmoFuQmg3gbvArGReNPHZWkpsel1mACvbo8flditfiMEv606e6Kwg",
       "name": "zusflee",
-      "id": "mWfUPYWKMd3kNfyqX6AZU5xQPxtH7jbsFi2daazN8qUhWGg",
-      "accountId": "zSMMSMrtSd0tlqksPSbiyRFO4jfqLkkTbWARCBSVsVkM0bbglH_kSNln",
-      "discord": "@martinsleo"
+      "discord": "martinsleo"
     }
   ]
 }
