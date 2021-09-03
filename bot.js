@@ -6,8 +6,11 @@ const {
 const Client = new DiscordClient({ ws: { intents: Intents.GUILD_MESSAGES } });
 const {
   prefix,
+  prefixSong,
+  prefixStopSong,
   token,
 } = require('./config.js');
+const { playSong } = require('./lib/brabaLauncher');
 const cron = require("node-cron");
 const express = require("express");
 const { json } = require("express");
@@ -21,7 +24,17 @@ const app = express();
 //-----------------------------------//
 Client.on('message', async message => {
   if (message.content.startsWith(prefix)) {
-    execute(message);
+    return execute(message);
+  }
+
+  if (message.content === prefixStopSong) message.member.voice.channel.leave();
+  
+  if (message.content.startsWith(prefixSong)) {
+    const args = message.content.split(' ');
+    const url = args[1];
+
+
+    await playSong(message.member.voice.channel, url);
   }
 });
 
@@ -38,7 +51,7 @@ Client.on('ready', () => {
     });
   Client.channels.fetch("679831039522373635")
     .then(async alisson => {
-      cron.schedule("* * * * *", async () => {
+      cron.schedule("* * * * *", async () => { //*/10 * * * * *
        lol(alisson);
       }, {
           scheduled: true,
@@ -398,14 +411,23 @@ async function audio(audio, gif, voice_channel, jogadores) {
       }
     })
   })
-  // ADICIONAR ID DO DISCORD NO CONTASLOL
+  //if(voice_channel.members){
+  //  voice_channel.members.forEach(member =>{
+  //    jogadores.forEach(jogador =>{
+  //      if(jogador == member.user.username){
+  //        mamadores.push(`<@${member.user.id}>`)
+  //      }
+  //    })
+  //  })
+
   const connection = await voice_channel.join();
   const dispatcher = connection.play(audio, { volume: getRandomVolume() });
   dispatcher.on('finish', (k) => {
     voice_channel.leave();
   });
   Client.channels.fetch("679831038796628048").then(async geral => {
-    geral.send(mamadores.join(' ') + ' mamou');
+    geral.send(mamadores.join(' '));
     return geral.send({ files: [gif] });
   })
-}
+  }
+//}
