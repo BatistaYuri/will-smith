@@ -238,6 +238,14 @@ const options = new Map([
       file: `${prefixAudio}/eele.mp3`,
     }
   ],
+  [
+    'machista2', {
+      command: 'machista2',
+      description: 'vai dirigir a cozinha',
+      file: `${prefixAudio}/machista2.mp3`,
+      foto: `${prefixFoto}/machista.jpg`
+    }
+  ],
 ]);
 
 function vazei(channel) {
