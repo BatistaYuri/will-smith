@@ -330,7 +330,7 @@ app.use(json());
 app.use(cors());true
 app.listen(process.env.PORT || 3333);
 const data = require('./contaslol.json')
-let emPartida = false
+let emPartida = true
 let count = 0
 let jogador = data.contas[count]
 
@@ -350,7 +350,7 @@ async function lol(voice_channel){
           emPartida = false
           getPartida(voice_channel)
         }else{
-          // gambiarra (2 da manha, to com preguiça)
+          //gambiarra (2 da manha, to com preguiça)
           if(count == 4){
             count = 0
             jogador = data.contas[count]
@@ -366,11 +366,11 @@ async function lol(voice_channel){
 async function getPartida(voice_channel){
   const request = await axios
     .get(
-      `https://br1.api.riotgames.com/lol/match/v4/matchlists/by-account/${jogador.accountId}`,
+      `https://americas.api.riotgames.com/lol/match/v5/matches/by-puuid/${jogador.puuid}/ids?start=0&count=1`,
       { headers: { "X-Riot-Token": process.env.LOL_KEY } }
     ).then((e) =>{
       if(e.status == 200){
-        getVitoria(e.data.matches[0].gameId, voice_channel)
+        getVitoria(e.data[0], voice_channel)
       }
     }).catch((err) => {
         console.log(err)
@@ -378,29 +378,30 @@ async function getPartida(voice_channel){
     );
 }
 
-async function getVitoria(gameId, voice_channel){
+async function getVitoria(match, voice_channel){
   let teamId = 0
   const request = await axios
     .get(
-      `https://br1.api.riotgames.com/lol/match/v4/matches/${gameId}`,
+      `https://americas.api.riotgames.com/lol/match/v5/matches/${match}`,
       { headers: { "X-Riot-Token": process.env.LOL_KEY } }
     ).then((e) =>{
       if(e.status == 200){
-        participante = e.data.participantIdentities.find(participante => participante.player.summonerName == jogador.name)
-        if(participante.participantId < 6){
-          teamId = 100
-        }else{
-          teamId = 200
-        }
+        participante = e.data.info.participants.find(participante => participante.puuid == jogador.puuid)
+        teamId = participante.teamId
+        // if(participante.participantId < 6){
+        //   teamId = 100
+        // }else{
+        //   teamId = 200
+        // }
         let jogadores =[]
-        e.data.participantIdentities.forEach(participante =>{
-          let player = data.contas.find(jogador => participante.player.summonerName == jogador.name)
+        e.data.metadata.participants.forEach(participantePuuid =>{
+          let player = data.contas.find(jogadori => participantePuuid == jogadori.puuid)
           if(player){
             jogadores.push(player.discord)
           }
         })
-        let win = e.data.teams.find(team => team.teamId == teamId).win
-        if(win == "Win"){
+        let win = e.data.info.teams.find(team => team.teamId == teamId).win
+        if(win){
           audio(`./audios/ganhamo.mp3`, `gifs/ganhamo.gif`, voice_channel, jogadores)
         }else{
           audio(`./audios/perdemo.mp3`, `gifs/perdemo.gif`, voice_channel, jogadores)
@@ -410,6 +411,7 @@ async function getVitoria(gameId, voice_channel){
 }
 
 async function audio(audio, gif, voice_channel, jogadores) {
+  console.log(jogadores)
   let mamadores = []
   //gambiarra, pq sou um inutil, find() não funciou por algum motivo vsf javascripto
   Client.users.cache.forEach(user =>{
@@ -438,4 +440,5 @@ async function audio(audio, gif, voice_channel, jogadores) {
     return geral.send({ files: [gif] });
   })
   }
+  
 //}
