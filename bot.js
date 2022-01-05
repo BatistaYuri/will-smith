@@ -51,7 +51,7 @@ Client.on('ready', () => {
     });
   Client.channels.fetch("679831039522373635")
     .then(async alisson => {
-      cron.schedule("* * * * *", async () => { //*/10 * * * * *
+      cron.schedule("*/10 * * * * *", async () => { //
        lol(alisson);
       }, {
           scheduled: true,
@@ -382,7 +382,7 @@ async function getVitoria(match, voice_channel){
   let teamId = 0
   const request = await axios
     .get(
-      `https://americas.api.riotgames.com/lol/match/v5/matches/${match}`,
+      `https://americas.api.riotgames.com/lol/match/v5/matches/BR1_2426620792`,
       { headers: { "X-Riot-Token": process.env.LOL_KEY } }
     ).then((e) =>{
       if(e.status == 200){
@@ -402,11 +402,11 @@ async function getVitoria(match, voice_channel){
         })
         let win = e.data.info.teams.find(team => team.teamId == teamId).win
         let mvp = getMVP(e.data, win)
-        if(win){
-          audio(`./audios/ganhamo.mp3`, `gifs/ganhamo.gif`, voice_channel, jogadores, mvp)
-        }else{
-          audio(`./audios/perdemo.mp3`, `gifs/perdemo.gif`, voice_channel, jogadores, mvp)
-        }
+         if(win){
+           audio(`./audios/ganhamo.mp3`, `gifs/ganhamo.gif`, voice_channel, jogadores, mvp)
+         }else{
+           audio(`./audios/perdemo.mp3`, `gifs/perdemo.gif`, voice_channel, jogadores, mvp)
+         }
       }
     })
 }
@@ -459,7 +459,8 @@ function getMVP(data, win) {
       maiorShield = participante.totalDamageShieldedOnTeammates
     }
 
-    participante.kda = (participante.kills + participante.assists) / participante.assists
+    
+    participante.kda = (participante.kills + participante.assists) / participante.deaths
     if (participante.kda > maiorKDA) {
       maiorKDA = participante.kda
     }
@@ -505,17 +506,17 @@ function getMVP(data, win) {
       totalMinions = (jogador.totalMinionsKilled * 10) / maiorTotalMinions
     }
 
-    if (jogador.totalHealsOnTeammates > maiorCura) {
-      cura = 25
-    } else {
-      cura = (jogador.totalHealsOnTeammates * 25) / maiorCura
-    }
+    // if (jogador.totalHealsOnTeammates > maiorCura) {
+    //   cura = 25
+    // } else {
+    //   cura = (jogador.totalHealsOnTeammates * 25) / maiorCura
+    // }
 
-    if (jogador.totalDamageShieldedOnTeammates > maiorShield) {
-      escudo = 25
-    } else {
-      escudo = (jogador.totalDamageShieldedOnTeammates * 25) / maiorShield
-    }
+    // if (jogador.totalDamageShieldedOnTeammates > maiorShield) {
+    //   escudo = 25
+    // } else {
+    //   escudo = (jogador.totalDamageShieldedOnTeammates * 25) / maiorShield
+    // }
 
     let total = dano + visao + danoTorre + kda + totalMinions + cura + escudo
     pontos.push({ nomeJogador: jogador.summonerName, puuidJogador: jogador.puuid, dano, visao, danoTorre, kda, totalMinions, cura, escudo, total })
@@ -524,15 +525,15 @@ function getMVP(data, win) {
 
   let mvp = { total: 0 }
   pontos.forEach(ponto => {
-    if(win){
-      if (ponto.total > mvp.total) {
-        mvp = ponto
+      if(win){
+        if (ponto.total > mvp.total) {
+          mvp = ponto
+        }
+      } else {
+        if (ponto.total < mvp.total || mvp.total == 0) {
+          mvp = ponto
+        }
       }
-    } else {
-      if (ponto.total < mvp.total) {
-        mvp = ponto
-      }
-    }
   })
 
   return mvp
