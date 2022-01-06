@@ -51,7 +51,7 @@ Client.on('ready', () => {
     });
   Client.channels.fetch("679831039522373635")
     .then(async alisson => {
-      cron.schedule("*/10 * * * * *", async () => { //
+      cron.schedule("* * * * *", async () => { // cron 1 minuto
        lol(alisson);
       }, {
           scheduled: true,
