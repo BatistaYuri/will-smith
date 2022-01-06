@@ -382,7 +382,7 @@ async function getVitoria(match, voice_channel){
   let teamId = 0
   const request = await axios
     .get(
-      `https://americas.api.riotgames.com/lol/match/v5/matches/BR1_2426620792`,
+      `https://americas.api.riotgames.com/lol/match/v5/matches/${match}`,
       { headers: { "X-Riot-Token": process.env.LOL_KEY } }
     ).then((e) =>{
       if(e.status == 200){
