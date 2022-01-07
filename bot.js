@@ -387,12 +387,6 @@ async function getVitoria(match, voice_channel){
     ).then((e) =>{
       if(e.status == 200){
         participante = e.data.info.participants.find(participante => participante.puuid == jogador.puuid)
-        teamId = participante.teamId
-        // if(participante.participantId < 6){
-        //   teamId = 100
-        // }else{
-        //   teamId = 200
-        // }
         let jogadores =[]
         e.data.metadata.participants.forEach(participantePuuid =>{
           let player = data.contas.find(jogadori => participantePuuid == jogadori.puuid)
@@ -400,8 +394,7 @@ async function getVitoria(match, voice_channel){
             jogadores.push(player.discord)
           }
         })
-        let win = e.data.info.teams.find(team => team.teamId == teamId).win
-        let mvp = getMVP(e.data, win)
+        let mvp = getMVP(e.data, participante.win)
          if(win){
            audio(`./audios/ganhamo.mp3`, `gifs/ganhamo.gif`, voice_channel, jogadores, mvp)
          }else{
@@ -468,13 +461,13 @@ function getMVP(data, win) {
 
   let pontos = []
   data.info.participants.forEach(jogador => {
-    let dano = 0
-    let visao = 0
-    let danoTorre = 0
-    let kda = 0
-    let totalMinions = 0
-    let cura = 0
-    let escudo = 0
+    let dano = 0 // 25
+    let visao = 0 // 10
+    let danoTorre = 0 // 10
+    let kda = 0 // 25
+    let totalMinions = 0 // 10
+    let cura = 0 // 25
+    let escudo = 0 // 25
 
     if (jogador.totalDamageDealtToChampions > maiorDano) {
       dano = 25
@@ -489,9 +482,9 @@ function getMVP(data, win) {
     }
 
     if (jogador.damageDealtToTurrets > maiorDanoTorre) {
-      danoTorre = 25
+      danoTorre = 10
     } else {
-      danoTorre = (jogador.damageDealtToTurrets * 25) / maiorDanoTorre
+      danoTorre = (jogador.damageDealtToTurrets * 10) / maiorDanoTorre
     }
 
     if (jogador.kda > maiorKDA) {
@@ -519,19 +512,26 @@ function getMVP(data, win) {
     // }
 
     let total = dano + visao + danoTorre + kda + totalMinions + cura + escudo
-    pontos.push({ nomeJogador: jogador.summonerName, puuidJogador: jogador.puuid, dano, visao, danoTorre, kda, totalMinions, cura, escudo, total })
+    if(jogador.win){
+      total = total + 5
+    }
+    pontos.push({ nomeJogador: jogador.summonerName, puuidJogador: jogador.puuid, dano, visao, danoTorre, kda, totalMinions, cura, escudo, total, win: jogador.win })
 
   })
 
   let mvp = { total: 0 }
   pontos.forEach(ponto => {
       if(win){
-        if (ponto.total > mvp.total) {
-          mvp = ponto
+        if(ponto.win){
+          if (ponto.total > mvp.total) {
+            mvp = ponto
+          }
         }
       } else {
-        if (ponto.total < mvp.total || mvp.total == 0) {
-          mvp = ponto
+        if(!ponto.win){
+          if (ponto.total < mvp.total || mvp.total == 0) {
+            mvp = ponto
+          }
         }
       }
   })
