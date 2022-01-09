@@ -107,7 +107,7 @@ damageSelfMitigated
 */
 
 function getMVP(data, win) {
-  let teamId = 200
+
   let maiorDano = 0
   let maiorVisao = 0
   let maiorDanoTorre = 0
@@ -115,7 +115,8 @@ function getMVP(data, win) {
   let maiorTotalMinions = 0
   let maiorCura = 0
   let maiorShield = 0
-  let time = []
+  let maiorParticipacao = 0
+
   data.info.participants.forEach(participante => {
     if (participante.totalDamageDealtToChampions > maiorDano) {
       maiorDano = participante.totalDamageDealtToChampions
@@ -136,6 +137,11 @@ function getMVP(data, win) {
       maiorShield = participante.totalDamageShieldedOnTeammates
     }
 
+    participante.participacaoAbates = participante.kills + participante.assists
+    if(participante.participacaoAbates > maiorParticipacao){
+      maiorParticipacao = participante.participacaoAbates
+    }
+
     
     participante.kda = (participante.kills + participante.assists) / participante.deaths
     if (participante.kda > maiorKDA) {
@@ -148,10 +154,11 @@ function getMVP(data, win) {
     let dano = 0 // 25
     let visao = 0 // 10
     let danoTorre = 0 // 10
-    let kda = 0 // 25
+    let kda = 0 // 35
     let totalMinions = 0 // 10
-    let cura = 0 // 25
-    let escudo = 0 // 25
+    let participacaoAbates = 0 // 25
+    let cura = 0 // 15
+    let escudo = 0 // 15
 
     if (jogador.totalDamageDealtToChampions > maiorDano) {
       dano = 25
@@ -172,40 +179,44 @@ function getMVP(data, win) {
     }
 
     if (jogador.kda > maiorKDA) {
-      kda = 25
+      kda = 35
     } else {
-      kda = (jogador.kda * 25) / (maiorKDA == 0 ? 1 : maiorKDA)
+      kda = (jogador.kda * 35) / (maiorKDA == 0 ? 1 : maiorKDA)
     }
 
-    if (jogador.totalMinionsKilled > maiorTotalMinions) { // não significa que farmou bem
+    if(jogador.participacaoAbates > maiorParticipacao) {
+      participacaoAbates = 25
+    } else {
+      participacaoAbates = (jogador.participacaoAbates * 25) / (maiorParticipacao == 0 ? 1 : maiorParticipacao)
+    }
+
+    if (jogador.totalMinionsKilled > maiorTotalMinions) {
       totalMinions = 10
     } else {
       totalMinions = (jogador.totalMinionsKilled * 10) / (maiorTotalMinions == 0 ? 1 : maiorTotalMinions)
     }
 
-    // if (jogador.totalHealsOnTeammates > maiorCura) {
-    //   cura = 25
-    // } else {
-    //   cura = (jogador.totalHealsOnTeammates * 25) / maiorCura
-    // }
+    if (jogador.totalHealsOnTeammates > maiorCura) {
+      cura = 15
+    } else {
+      cura = (jogador.totalHealsOnTeammates * 15) / maiorCura
+    }
 
-    // if (jogador.totalDamageShieldedOnTeammates > maiorShield) {
-    //   escudo = 25
-    // } else {
-    //   escudo = (jogador.totalDamageShieldedOnTeammates * 25) / maiorShield
-    // }
+    if (jogador.totalDamageShieldedOnTeammates > maiorShield) {
+      escudo = 15
+    } else {
+      escudo = (jogador.totalDamageShieldedOnTeammates * 15) / maiorShield
+    }
 
-    let total = dano + visao + danoTorre + kda + totalMinions + cura + escudo
+    let total = dano + visao + danoTorre + kda + participacaoAbates + totalMinions + cura + escudo
     if(jogador.win){
       total = total + 5
     }
-    console.log("total " + total)
     pontos.push({ nomeJogador: jogador.summonerName, puuidJogador: jogador.puuid, dano, visao, danoTorre, kda, totalMinions, cura, escudo, total, win: jogador.win })
 
   })
 
   let mvp = { total: 0 }
-  console.log(pontos)
   pontos.forEach(ponto => {
       if(win){
         if(ponto.win){
@@ -243,9 +254,6 @@ async function audio(audio, gif, voice_channel, jogadores, mvp, win) {
     voice_channel.leave();
   });
   Client.channels.fetch("679831038796628048").then(async geral => {
-    console.log(mamadores)
-    console.log(win)
-    console.log(mvp)
     geral.send(mamadores.join(' '));
     geral.send(win ? `MVP: ${mvp.nomeJogador}` : `MVP inverso: ${mvp.nomeJogador}`)
     return geral.send({ files: [gif] });
