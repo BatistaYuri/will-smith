@@ -90,5 +90,9 @@
   {
     "name": "machista2",
     "description": "vai dirigir a cozinha"
+  },
+  {
+    "name": "skype",
+    "description": "toque da chamada do skype"
   }
 ]
