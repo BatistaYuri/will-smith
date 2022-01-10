@@ -67,9 +67,9 @@ async function execute(message) {
     return message.channel.send('opção n existe')
   }
 
-  const audio = fs.existsSync(`./audio/${opt.name}.mp3`) ? `./audio/${opt.name}.mp3` : null;
+  const audio = fs.existsSync(`./audios/${opt.name}.mp3`) ? `./audios/${opt.name}.mp3` : null;
   const gif = fs.existsSync(`./gifs/${opt.name}.gif`) ? `./gifs/${opt.name}.gif` : null;
-  const foto = fs.existsSync(`./fotos/${opt.name}.jpg` ? `./fotos/${opt.name}.jpg` : null);
+  const foto = fs.existsSync(`./fotos/${opt.name}.jpg`) ? `./fotos/${opt.name}.jpg` : null;
 
   try {
     const connection = await voiceChannel.join();
