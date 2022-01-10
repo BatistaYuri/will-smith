@@ -61,7 +61,7 @@ async function execute(message) {
   }
 
   const permissions = voiceChannel.permissionsFor(message.client.user);
-  const opt = options.get(option);
+  const opt = commands.get(option);
 
   if (!opt) {
     return message.channel.send('opção n existe')
