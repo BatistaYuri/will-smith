@@ -3,12 +3,13 @@ const { json } = require("express");
 const axios = require("axios");
 const cors = require("cors");
 const app = express();
+const { MessageEmbed, MessageAttachment } = require('discord.js');
 
 app.use(json());
 app.use(cors());
 app.listen(process.env.PORT || 3333);
 const data = require('./contaslol.json')
-let emPartida = false
+let emPartida = true
 let count = 0
 let jogador = data.contas[count]
 let Client
@@ -18,7 +19,7 @@ exports.lol = (client, voice_channel) => {
   return lol(voice_channel);
 }
 
-async function lol(voice_channel){
+async function lol(voice_channel) {
   console.log('emPartida = ' + emPartida)
   const request = await axios
     .get(
@@ -26,64 +27,60 @@ async function lol(voice_channel){
       { headers: { "X-Riot-Token": process.env.LOL_KEY } }
     )
     .then((e) => {
-      if(e.status == 200){
-        emPartida = true 
+      if (e.status == 200) {
+        emPartida = true
       }
     }).catch((err) => {
-        if(emPartida == true){
-          emPartida = false
-          getPartida(voice_channel)
-        }else{
-          //gambiarra (2 da manha, to com preguiça)
-          if(count == 4){
-            count = 0
-            jogador = data.contas[count]
-          }else{
-            count = count + 1
-            jogador = data.contas[count]
-          }
+      if (emPartida == true) {
+        emPartida = false
+        getPartida(voice_channel)
+      } else {
+        //gambiarra (2 da manha, to com preguiça)
+        if (count == 4) {
+          count = 0
+          jogador = data.contas[count]
+        } else {
+          count = count + 1
+          jogador = data.contas[count]
         }
+      }
     }
     );
 }
 
-async function getPartida(voice_channel){
+async function getPartida(voice_channel) {
   const request = await axios
     .get(
       `https://americas.api.riotgames.com/lol/match/v5/matches/by-puuid/${jogador.puuid}/ids?start=0&count=1`,
       { headers: { "X-Riot-Token": process.env.LOL_KEY } }
-    ).then((e) =>{
-      if(e.status == 200){
+    ).then((e) => {
+      if (e.status == 200) {
         getVitoria(e.data[0], voice_channel)
       }
     }).catch((err) => {
-        console.log(err)
+      console.log(err)
     }
     );
 }
 
-async function getVitoria(match, voice_channel){
+async function getVitoria(match, voice_channel) {
   let teamId = 0
   const request = await axios
     .get(
       `https://americas.api.riotgames.com/lol/match/v5/matches/${match}`,
       { headers: { "X-Riot-Token": process.env.LOL_KEY } }
-    ).then((e) =>{
-      if(e.status == 200){
+    ).then((e) => {
+      if (e.status == 200) {
         participante = e.data.info.participants.find(participante => participante.puuid == jogador.puuid)
-        let jogadores =[]
-        e.data.metadata.participants.forEach(participantePuuid =>{
+        let jogadores = []
+        e.data.metadata.participants.forEach(participantePuuid => {
           let player = data.contas.find(jogadori => participantePuuid == jogadori.puuid)
-          if(player){
+          if (player) {
             jogadores.push(player.discord)
           }
         })
-        let mvp = getMVP(e.data, participante.win)
-         if(participante.win){
-           audio(`./audios/ganhamo.mp3`, `gifs/ganhamo.gif`, voice_channel, jogadores, mvp, participante.win)
-         }else{
-           audio(`./audios/perdemo.mp3`, `gifs/perdemo.gif`, voice_channel, jogadores, mvp, participante.win)
-         }
+        let mvps = getMVP(e.data, participante.win)
+        audio(voice_channel, jogadores, mvps, participante.win)
       }
     })
 }
@@ -138,11 +135,11 @@ function getMVP(data, win) {
     }
 
     participante.participacaoAbates = participante.kills + participante.assists
-    if(participante.participacaoAbates > maiorParticipacao){
+    if (participante.participacaoAbates > maiorParticipacao) {
       maiorParticipacao = participante.participacaoAbates
     }
 
-    
+
     participante.kda = (participante.kills + participante.assists) / participante.deaths
     if (participante.kda > maiorKDA) {
       maiorKDA = participante.kda
@@ -184,7 +181,7 @@ function getMVP(data, win) {
       kda = (jogador.kda * 35) / (maiorKDA == 0 ? 1 : maiorKDA)
     }
 
-    if(jogador.participacaoAbates > maiorParticipacao) {
+    if (jogador.participacaoAbates > maiorParticipacao) {
       participacaoAbates = 25
     } else {
       participacaoAbates = (jogador.participacaoAbates * 25) / (maiorParticipacao == 0 ? 1 : maiorParticipacao)
@@ -205,62 +202,71 @@ function getMVP(data, win) {
     if (jogador.totalDamageShieldedOnTeammates > maiorShield) {
       escudo = 15
     } else {
-      escudo = (jogador.totalDamageShieldedOnTeammates * 15) / maiorShield
+      escudo = (jogador.totalDamageShieldedOnTeammates * 15) / (maiorShield == 0 ? 1 : maiorShield)
     }
 
     let total = dano + visao + danoTorre + kda + participacaoAbates + totalMinions + cura + escudo
-    if(jogador.win){
+    if (jogador.win) {
       total = total + 5
     }
-    pontos.push({ nomeJogador: jogador.summonerName, puuidJogador: jogador.puuid, dano, visao, danoTorre, kda, totalMinions, cura, escudo, total, win: jogador.win })
+    pontos.push({ jogador: jogador, total, win: jogador.win })
 
   })
 
   let mvp = { total: 0 }
+  let inverso = { total: 0 }
   pontos.forEach(ponto => {
-      if(win){
-        if(ponto.win){
-          if (ponto.total > mvp.total) {
-            mvp = ponto
-          }
-        }
-      } else {
-        if(!ponto.win){
-          if (ponto.total < mvp.total || mvp.total == 0) {
-            mvp = ponto
-          }
-        }
-      }
-  })
 
-  return mvp
+    if (ponto.win) {
+      if (ponto.total > mvp.total) {
+        mvp = ponto
+      }
+    }
+
+    if (!ponto.win) {
+      if (ponto.total < inverso.total || inverso.total == 0) {
+        inverso = ponto
+      }
+    }
+
+  })
+  return { mvp, inverso }
 }
 
 
-async function audio(audio, gif, voice_channel, jogadores, mvp, win) {
+async function audio(voice_channel, jogadores, mvps, win) {
   let mamadores = []
   //gambiarra, pq sou um inutil, find() não funciou por algum motivo vsf javascripto
-  Client.users.cache.forEach(user =>{
-    jogadores.forEach(jogador =>{
-      if(jogador == user.username){
+  Client.users.cache.forEach(user => {
+    jogadores.forEach(jogador => {
+      if (jogador == user.username) {
         mamadores.push(`<@${user.id}>`)
       }
     })
   })
 
   const connection = await voice_channel.join();
+  let audio = win ? `./audios/ganhamo.mp3` : `./audios/perdemo.mp3`
   const dispatcher = connection.play(audio, { volume: getRandomVolume() });
   dispatcher.on('finish', (k) => {
     voice_channel.leave();
   });
-  Client.channels.fetch("679831038796628048").then(async geral => {
-    geral.send(mamadores.join(' '));
-    geral.send(win ? `MVP: ${mvp.nomeJogador}` : `MVP inverso: ${mvp.nomeJogador}`)
-    return geral.send({ files: [gif] });
-  })
-  }
 
-  function getRandomVolume() {
-    const random = Math.round(Math.random() * 10) + 1;
-    return random === 10 ? 100000000 : 0.9;
-  }
+  let gif = win ? `ganhamo.gif` : `perdemo.gif`
+  Client.channels.fetch("679831038796628048").then(async geral => {
+    const attachment = new MessageAttachment(`./gifs/ganhamo.gif`, gif);
+    const embed = new MessageEmbed()
+      .setTitle(win ? 'VITORIA' : 'DERROTA')
+      .setDescription(`MVP: **${mvps.mvp.jogador.summonerName}**
+      MVP Inverso: **${mvps.inverso.jogador.summonerName}**`)
+      .attachFiles(attachment)
+      .setImage('attachment://ganhamo.gif')
+      .setThumbnail(`http://ddragon.leagueoflegends.com/cdn/12.1.1/img/champion/${mvps.mvp.jogador.championName}.png`)
+    return geral.send({ embed })
+  })
+}
+
+function getRandomVolume() {
+  const random = Math.round(Math.random() * 10) + 1;
+  return random === 10 ? 100000000 : 0.9;
+}
