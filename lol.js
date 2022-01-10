@@ -13,6 +13,7 @@ let emPartida = false
 let count = 0
 let jogador = data.contas[count]
 let Client
+let matchUltimaPartida = null
 
 exports.lol = (client, voice_channel) => {
   Client = client;
@@ -64,25 +65,27 @@ async function getPartida(voice_channel) {
 }
 
 async function getVitoria(match, voice_channel) {
-  let teamId = 0
-  const request = await axios
-    .get(
-      `https://americas.api.riotgames.com/lol/match/v5/matches/${match}`,
-      { headers: { "X-Riot-Token": process.env.LOL_KEY } }
-    ).then((e) => {
-      if (e.status == 200) {
-        participante = e.data.info.participants.find(participante => participante.puuid == jogador.puuid)
-        let jogadores = []
-        e.data.metadata.participants.forEach(participantePuuid => {
-          let player = data.contas.find(jogadori => participantePuuid == jogadori.puuid)
-          if (player) {
-            jogadores.push(player.discord)
-          }
-        })
-        let mvps = getMVP(e.data, participante.win)
-        audio(voice_channel, jogadores, mvps, participante.win)
-      }
-    })
+  if (matchUltimaPartida != match) {
+    matchUltimaPartida = match
+    const request = await axios
+      .get(
+        `https://americas.api.riotgames.com/lol/match/v5/matches/${match}`,
+        { headers: { "X-Riot-Token": process.env.LOL_KEY } }
+      ).then((e) => {
+        if (e.status == 200) {
+          participante = e.data.info.participants.find(participante => participante.puuid == jogador.puuid)
+          let jogadores = []
+          e.data.metadata.participants.forEach(participantePuuid => {
+            let player = data.contas.find(jogadori => participantePuuid == jogadori.puuid)
+            if (player) {
+              jogadores.push(player.discord)
+            }
+          })
+          let mvps = getMVP(e.data, participante.win)
+          audio(voice_channel, jogadores, mvps, participante.win)
+        }
+      })
+  }
 }
 
 /*
