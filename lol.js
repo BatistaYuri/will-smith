@@ -9,7 +9,7 @@ app.use(json());
 app.use(cors());
 app.listen(process.env.PORT || 3333);
 const data = require('./contaslol.json')
-let emPartida = true
+let emPartida = false
 let count = 0
 let jogador = data.contas[count]
 let Client
