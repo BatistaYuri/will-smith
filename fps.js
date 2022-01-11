@@ -18,9 +18,9 @@ function play(connection){
     if(!this.stoped){
         setTimeout(() => {
             console.log('entrou')
-            connection.play(getRandomAudio(), { volume: 0.9 });
+            connection.play(getRandomAudio(), { volume: 100 });
             play(connection)
-        }, 10000)
+        }, getRandomTime())
     }
 }
 
