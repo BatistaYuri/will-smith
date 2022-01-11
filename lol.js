@@ -263,7 +263,7 @@ async function audio(voice_channel, jogadores, mvps, win) {
       .setDescription(`MVP: **${mvps.mvp.jogador.summonerName}**
       MVP Inverso: **${mvps.inverso.jogador.summonerName}**`)
       .attachFiles(attachment)
-      .setImage('attachment://ganhamo.gif')
+      .setImage(`attachment://${gif}`)
       .setThumbnail(`http://ddragon.leagueoflegends.com/cdn/12.1.1/img/champion/${mvps.mvp.jogador.championName}.png`)
     return geral.send({ embed })
   })
