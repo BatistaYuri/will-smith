@@ -94,5 +94,13 @@
   {
     "name": "skype",
     "description": "toque da chamada do skype"
+  },
+  {
+    "name": "fps",
+    "description": "locura"
+  },
+  {
+    "name": "stop",
+    "description": "pari"
   }
 ]

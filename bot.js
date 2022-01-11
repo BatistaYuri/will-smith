@@ -17,19 +17,21 @@ const fs = require('fs');
 
 const cron = require("node-cron");
 const lol = require('./lol.js')
+const fps = require('./fps.js')
 
-Client.on('ready', () => {
-  console.log('Connected');
-  Client.channels.fetch("679831039522373635")
-    .then(async voice_channel => {
-      cron.schedule("* * * * *", async () => { // cron 1 minuto
-        const teste = require("./lol.js").lol(Client, voice_channel)
-      }, {
-          scheduled: true,
-          timezone: "America/Sao_Paulo"
-        });
-    });
-});
+// Client.on('ready', () => {
+//   console.log('Connected');
+//   console.log(Client.channels)
+//   Client.channels.fetch("679831039522373635")
+//     .then(async voice_channel => {
+//       cron.schedule("* * * * *", async () => { // cron 1 minuto
+//         const teste = require("./lol.js").lol(Client, voice_channel)
+//       }, {
+//           scheduled: true,
+//           timezone: "America/Sao_Paulo"
+//         });
+//     });
+// });
 
 Client.on('message', async message => {
   if (message.content.startsWith(prefix)) {
@@ -65,6 +67,10 @@ async function execute(message) {
 
   if (!opt) {
     return message.channel.send('opção n existe')
+  } else if (opt.name == 'fps') {
+    return require("./fps.js").fps(voiceChannel)
+  } else if (opt.name == 'stop') {
+    return require("./fps.js").stop(voiceChannel)
   }
 
   const audio = fs.existsSync(`./audios/${opt.name}.mp3`) ? `./audios/${opt.name}.mp3` : null;
