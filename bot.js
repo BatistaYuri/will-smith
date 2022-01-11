@@ -19,19 +19,19 @@ const cron = require("node-cron");
 const lol = require('./lol.js')
 const fps = require('./fps.js')
 
-// Client.on('ready', () => {
-//   console.log('Connected');
-//   console.log(Client.channels)
-//   Client.channels.fetch("679831039522373635")
-//     .then(async voice_channel => {
-//       cron.schedule("* * * * *", async () => { // cron 1 minuto
-//         const teste = require("./lol.js").lol(Client, voice_channel)
-//       }, {
-//           scheduled: true,
-//           timezone: "America/Sao_Paulo"
-//         });
-//     });
-// });
+Client.on('ready', () => {
+  console.log('Connected');
+  console.log(Client.channels)
+  Client.channels.fetch("679831039522373635")
+    .then(async voice_channel => {
+      cron.schedule("* * * * *", async () => { // cron 1 minuto
+        const teste = require("./lol.js").lol(Client, voice_channel)
+      }, {
+          scheduled: true,
+          timezone: "America/Sao_Paulo"
+        });
+    });
+});
 
 Client.on('message', async message => {
   if (message.content.startsWith(prefix)) {
