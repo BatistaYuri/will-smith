@@ -17,7 +17,7 @@ async function fps(voice_channel) {
 function play(connection){
     if(!this.stoped){
         setTimeout(() => {
-            connection.play(getRandomAudio(), { volume: 5 });
+            connection.play(getRandomAudio(), { volume: 1 });
             play(connection)
         }, getRandomTime())
     }
