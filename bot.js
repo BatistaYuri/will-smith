@@ -21,7 +21,6 @@ const fps = require('./fps.js')
 
 Client.on('ready', () => {
   console.log('Connected');
-  console.log(Client.channels)
   Client.channels.fetch("679831039522373635")
     .then(async voice_channel => {
       cron.schedule("* * * * *", async () => { // cron 1 minuto
