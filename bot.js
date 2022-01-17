@@ -23,7 +23,7 @@ Client.on('ready', () => {
   console.log('Connected');
   Client.channels.fetch("679831039522373635")
     .then(async voice_channel => {
-      cron.schedule("* * * * *", async () => { // cron 1 minuto
+      cron.schedule("*/10 * * * * *", async () => { // cron 1 minuto
         const teste = require("./lol.js").lol(Client, voice_channel)
       }, {
           scheduled: true,
