@@ -202,11 +202,11 @@ function getMVP(data, win) {
       cura = (jogador.totalHealsOnTeammates * 15) / maiorCura
     }
 
-    if (jogador.totalDamageShieldedOnTeammates > maiorShield) {
-      escudo = 15
-    } else {
-      escudo = (jogador.totalDamageShieldedOnTeammates * 15) / (maiorShield == 0 ? 1 : maiorShield)
-    }
+    // if (jogador.totalDamageShieldedOnTeammates > maiorShield) {
+    //   escudo = 15
+    // } else {
+    //   escudo = (jogador.totalDamageShieldedOnTeammates * 15) / (maiorShield == 0 ? 1 : maiorShield)
+    // }
 
     let total = dano + visao + danoTorre + kda + participacaoAbates + totalMinions + cura + escudo
     if (jogador.win) {
