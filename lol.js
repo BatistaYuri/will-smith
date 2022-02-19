@@ -142,8 +142,7 @@ function getMVP(data, win) {
       maiorParticipacao = participante.participacaoAbates
     }
 
-
-    participante.kda = (participante.kills + participante.assists) / participante.deaths
+    participante.kda = (participante.kills + participante.assists) / (participante.deaths == 0 ? 1 : participante.deaths) 
     if (participante.kda > maiorKDA) {
       maiorKDA = participante.kda
     }
