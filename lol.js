@@ -255,7 +255,7 @@ async function audio(voice_channel, jogadores, mvps, win) {
   });
 
   let gif = win ? `ganhamo.gif` : `perdemo.gif`
-  Client.channels.fetch("679831038796628048").then(async geral => {
+  Client.channels.fetch("958513274238935100").then(async geral => {
     const attachment = new MessageAttachment(`./gifs/${gif}`, gif);
     const embed = new MessageEmbed()
       .setTitle(win ? 'VITORIA' : 'DERROTA')
