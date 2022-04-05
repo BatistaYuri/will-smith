@@ -198,7 +198,7 @@ function getMVP(data, win) {
     if (jogador.totalHealsOnTeammates > maiorCura) {
       cura = 15
     } else {
-      cura = (jogador.totalHealsOnTeammates * 15) / maiorCura
+      cura = (jogador.totalHealsOnTeammates * 15) /  (maiorCura == 0 ? 1 : maiorCura)
     }
 
     // if (jogador.totalDamageShieldedOnTeammates > maiorShield) {
