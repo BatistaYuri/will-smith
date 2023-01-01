@@ -10,6 +10,7 @@ app.use(cors());
 app.listen(process.env.PORT || 3333);
 const data = require('./contaslol.json')
 let emPartida = false
+let gameId = null
 let count = 0
 let jogador = data.contas[count]
 let Client
@@ -22,7 +23,19 @@ exports.lol = (client, voice_channel) => {
 
 async function lol(voice_channel) {
   console.log('emPartida = ' + emPartida)
-  const request = await axios
+  if(emPartida == true){
+    await axios.get(`https://americas.api.riotgames.com/lol/match/v5/matches/${gameId}`,
+    { headers: { "X-Riot-Token": process.env.LOL_KEY } }
+    ).then((e) => {
+      if (e.status == 200) {
+      emPartida = false;
+      getVitoria(gameId, voice_channel)
+      }
+    }).catch((err) => {
+      
+    })
+  } else {
+    const request = await axios
     .get(
       `https://br1.api.riotgames.com/lol/spectator/v4/active-games/by-summoner/${jogador.id}`,
       { headers: { "X-Riot-Token": process.env.LOL_KEY } }
@@ -30,6 +43,7 @@ async function lol(voice_channel) {
     .then((e) => {
       if (e.status == 200) {
         emPartida = true
+        gameId = `BR1_${e.data.gameId}`
       }
     }).catch((err) => {
       if (emPartida == true) {
@@ -47,6 +61,7 @@ async function lol(voice_channel) {
       }
     }
     );
+  }
 }
 
 async function getPartida(voice_channel) {
