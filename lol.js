@@ -18,7 +18,7 @@ let matchUltimaPartida = null
 
 exports.lol = (client, voice_channel) => {
   Client = client;
-  return getPartida(voice_channel);
+  return lol(voice_channel);
 }
 
 async function lol(voice_channel) {
