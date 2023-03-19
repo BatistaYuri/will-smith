@@ -28,9 +28,5 @@ vitoria - 5
 
 
 
-damageTakenOnTeamPercentage // dano recebido pela equipe em %
-dodgeSkillShotsSmallWindow
 epicMonsterSteals && epicMonsterStolenWithoutSmite // fazer audio
-kda
-killParticipation
 

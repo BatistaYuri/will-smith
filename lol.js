@@ -18,7 +18,7 @@ let matchUltimaPartida = null
 
 exports.lol = (client, voice_channel) => {
   Client = client;
-  return lol(voice_channel);
+  return getPartida(voice_channel);
 }
 
 async function lol(voice_channel) {
@@ -123,14 +123,15 @@ damageSelfMitigated
 
 function getMVP(data, win) {
 
+  let maiorKDA = 0
   let maiorDano = 0
+  let maiorParticipacao = 0
   let maiorVisao = 0
   let maiorDanoTorre = 0
-  let maiorKDA = 0
-  let maiorTotalMinions = 0
+  //sup
   let maiorCura = 0
   let maiorShield = 0
-  let maiorParticipacao = 0
+  let maiorTank = 0
 
   data.info.participants.forEach(participante => {
     if (participante.totalDamageDealtToChampions > maiorDano) {
@@ -142,91 +143,113 @@ function getMVP(data, win) {
     if (participante.damageDealtToTurrets > maiorDanoTorre) {
       maiorDanoTorre = participante.damageDealtToTurrets
     }
-    if (participante.totalMinionsKilled > maiorTotalMinions) {
-      maiorTotalMinions = participante.totalMinionsKilled
-    }
-    if (participante.totalHealsOnTeammates > maiorCura) {
-      maiorCura = participante.totalHealsOnTeammates
-    }
-    if (participante.totalDamageShieldedOnTeammates > maiorShield) {
-      maiorShield = participante.totalDamageShieldedOnTeammates
-    }
-
     participante.participacaoAbates = participante.kills + participante.assists
     if (participante.participacaoAbates > maiorParticipacao) {
       maiorParticipacao = participante.participacaoAbates
     }
-
     participante.kda = (participante.kills + participante.assists) / (participante.deaths == 0 ? 1 : participante.deaths) 
     if (participante.kda > maiorKDA) {
       maiorKDA = participante.kda
+    }
+    if(participante.individualPosition == 'UTILITY'){
+      if (participante.totalHealsOnTeammates > maiorCura) {
+        maiorCura = participante.totalHealsOnTeammates
+      }
+      if (participante.totalDamageShieldedOnTeammates > maiorShield) {
+        maiorShield = participante.totalDamageShieldedOnTeammates
+      }
+      if (participante.totalDamageTaken > maiorTank) {
+        maiorShield = participante.totalDamageTaken
+      }
     }
   })
 
   let pontos = []
   data.info.participants.forEach(jogador => {
+    let participacaoAbates = 0 // 27,5
     let dano = 0 // 25
+    let kda = 0 // 22,5
     let visao = 0 // 10
     let danoTorre = 0 // 10
-    let kda = 0 // 35
-    let totalMinions = 0 // 10
-    let participacaoAbates = 0 // 25
-    let cura = 0 // 15
-    let escudo = 0 // 15
+    // sup
+    let cura = 0 // 12,5
+    let escudo = 0 // 12,5
+    let tank = 0 // 12,5
+
+    if (jogador.participacaoAbates > maiorParticipacao) {
+      participacaoAbates = 27.5
+    } else {
+      participacaoAbates = (jogador.participacaoAbates * 27.5) / (maiorParticipacao == 0 ? 1 : maiorParticipacao)
+      participacaoAbates = +participacaoAbates.toFixed(2);
+    }
 
     if (jogador.totalDamageDealtToChampions > maiorDano) {
       dano = 25
     } else {
       dano = (jogador.totalDamageDealtToChampions * 25) / (maiorDano == 0 ? 1 : maiorDano)
+      dano = +dano.toFixed(2);
+    }
+
+    if (jogador.kda > maiorKDA) {
+      kda = 22.5
+    } else {
+      kda = (jogador.kda * 22.5) / (maiorKDA == 0 ? 1 : maiorKDA)
+      kda = +kda.toFixed(2);
     }
 
     if (jogador.visionScore > maiorVisao) {
       visao = 10
     } else {
       visao = (jogador.visionScore * 10) / (maiorVisao == 0 ? 1 : maiorVisao)
+      visao = +visao.toFixed(2);
     }
 
     if (jogador.damageDealtToTurrets > maiorDanoTorre) {
       danoTorre = 10
     } else {
       danoTorre = (jogador.damageDealtToTurrets * 10) / (maiorDanoTorre == 0 ? 1 : maiorDanoTorre)
+      danoTorre = +danoTorre.toFixed(2);
     }
 
-    if (jogador.kda > maiorKDA) {
-      kda = 35
-    } else {
-      kda = (jogador.kda * 35) / (maiorKDA == 0 ? 1 : maiorKDA)
+    if(jogador.individualPosition == 'UTILITY'){
+      if (jogador.totalHealsOnTeammates > maiorCura) {
+        cura = 12.5
+      } else {
+        cura = (jogador.totalHealsOnTeammates * 12.5) /  (maiorCura == 0 ? 1 : maiorCura)
+        cura = +cura.toFixed(2);
+      }
+      if (jogador.totalDamageShieldedOnTeammates > maiorShield) {
+        escudo = 12.5
+      } else {
+        escudo = (jogador.totalDamageShieldedOnTeammates * 12.5) /  (maiorShield == 0 ? 1 : maiorShield)
+        escudo = +escudo.toFixed(2);
+      }
+      if (jogador.totalDamageTaken > maiorTank) {
+        tank = 12.5
+      } else {
+        tank = (jogador.totalDamageTaken * 12.5) /  (maiorTank == 0 ? 1 : maiorTank)
+        tank = +tank.toFixed(2);
+      }
     }
 
-    if (jogador.participacaoAbates > maiorParticipacao) {
-      participacaoAbates = 25
-    } else {
-      participacaoAbates = (jogador.participacaoAbates * 25) / (maiorParticipacao == 0 ? 1 : maiorParticipacao)
-    }
-
-    if (jogador.totalMinionsKilled > maiorTotalMinions) {
-      totalMinions = 10
-    } else {
-      totalMinions = (jogador.totalMinionsKilled * 10) / (maiorTotalMinions == 0 ? 1 : maiorTotalMinions)
-    }
-
-    if (jogador.totalHealsOnTeammates > maiorCura) {
-      cura = 15
-    } else {
-      cura = (jogador.totalHealsOnTeammates * 15) /  (maiorCura == 0 ? 1 : maiorCura)
-    }
-
-    // if (jogador.totalDamageShieldedOnTeammates > maiorShield) {
-    //   escudo = 15
-    // } else {
-    //   escudo = (jogador.totalDamageShieldedOnTeammates * 15) / (maiorShield == 0 ? 1 : maiorShield)
-    // }
-
-    let total = dano + visao + danoTorre + kda + participacaoAbates + totalMinions + cura + escudo
+    let total = dano + visao + danoTorre + kda + participacaoAbates + cura + escudo + tank
     if (jogador.win) {
       total = total + 5
     }
-    pontos.push({ jogador: jogador, total, win: jogador.win })
+    total = +total.toFixed(2);
+    pontos.push(
+      { jogador: jogador,
+        total, 
+        win: jogador.win, 
+        dano, 
+        visao, 
+        danoTorre, 
+        kda, 
+        participacaoAbates, 
+        cura, 
+        escudo, 
+        tank }
+        )
 
   })
 
@@ -245,9 +268,17 @@ function getMVP(data, win) {
         inverso = ponto
       }
     }
-
   })
-  return { mvp, inverso }
+  pontos = pontos.sort((a, b) => {
+    if(a.total > b.total){
+      return -1;
+    }
+    if(a.total < b.total){
+      return 1;
+    }
+    return 0;
+  })
+  return { mvp, inverso, pontos }
 }
 
 
@@ -274,8 +305,18 @@ async function audio(voice_channel, jogadores, mvps, win) {
     const attachment = new MessageAttachment(`./gifs/${gif}`, gif);
     const embed = new MessageEmbed()
       .setTitle(win ? 'VITORIA' : 'DERROTA')
-      .setDescription(`MVP: **${mvps.mvp.jogador.summonerName}**
-      MVP Inverso: **${mvps.inverso.jogador.summonerName}**`)
+      .setDescription(`
+      **MVP ${mvps.pontos[0].jogador.summonerName}** - ${mvps.pontos[0].total}
+        2º **${mvps.pontos[1].jogador.summonerName}** - ${mvps.pontos[1].total}
+        3º **${mvps.pontos[2].jogador.summonerName}** - ${mvps.pontos[2].total}
+        4º **${mvps.pontos[3].jogador.summonerName}** - ${mvps.pontos[3].total}
+        5º **${mvps.pontos[4].jogador.summonerName}** - ${mvps.pontos[4].total}
+        6º **${mvps.pontos[5].jogador.summonerName}** - ${mvps.pontos[5].total}
+        7º **${mvps.pontos[6].jogador.summonerName}** - ${mvps.pontos[6].total}
+        8º **${mvps.pontos[7].jogador.summonerName}** - ${mvps.pontos[7].total}
+        9º **${mvps.pontos[8].jogador.summonerName}** - ${mvps.pontos[8].total}
+        **MVP Inverso ${mvps.pontos[9].jogador.summonerName}** - ${mvps.pontos[9].total}
+      `)
       .attachFiles(attachment)
       .setImage(`attachment://${gif}`)
       .setThumbnail(`http://ddragon.leagueoflegends.com/cdn/12.1.1/img/champion/${mvps.mvp.jogador.championName}.png`)
