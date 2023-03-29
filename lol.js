@@ -151,7 +151,7 @@ function getMVP(data, win) {
     if (participante.kda > maiorKDA) {
       maiorKDA = participante.kda
     }
-    if(participante.individualPosition == 'UTILITY'){
+    //if(participante.individualPosition == 'UTILITY'){
       if (participante.totalHealsOnTeammates > maiorCura) {
         maiorCura = participante.totalHealsOnTeammates
       }
@@ -161,7 +161,7 @@ function getMVP(data, win) {
       if (participante.totalDamageTaken > maiorTank) {
         maiorShield = participante.totalDamageTaken
       }
-    }
+    //}
   })
 
   let pontos = []
@@ -211,7 +211,7 @@ function getMVP(data, win) {
       danoTorre = +danoTorre.toFixed(2);
     }
 
-    if(jogador.individualPosition == 'UTILITY'){
+    //if(jogador.individualPosition == 'UTILITY'){
       if (jogador.totalHealsOnTeammates > maiorCura) {
         cura = 12.5
       } else {
@@ -230,7 +230,7 @@ function getMVP(data, win) {
         tank = (jogador.totalDamageTaken * 12.5) /  (maiorTank == 0 ? 1 : maiorTank)
         tank = +tank.toFixed(2);
       }
-    }
+    //}
 
     let total = dano + visao + danoTorre + kda + participacaoAbates + cura + escudo + tank
     if (jogador.win) {
@@ -293,12 +293,12 @@ async function audio(voice_channel, jogadores, mvps, win) {
     })
   })
 
-  const connection = await voice_channel.join();
-  let audio = win ? `./audios/ganhamo.mp3` : `./audios/perdemo.mp3`
-  const dispatcher = connection.play(audio, { volume: getRandomVolume() });
-  dispatcher.on('finish', (k) => {
-    voice_channel.leave();
-  });
+  //const connection = await voice_channel.join();
+  //let audio = win ? `./audios/ganhamo.mp3` : `./audios/perdemo.mp3`
+  //const dispatcher = connection.play(audio, { volume: getRandomVolume() });
+  //dispatcher.on('finish', (k) => {
+  //  voice_channel.leave();
+  //});
 
   let gif = win ? `ganhamo.gif` : `perdemo.gif`
   Client.channels.fetch("958513274238935100").then(async geral => {
@@ -315,7 +315,7 @@ async function audio(voice_channel, jogadores, mvps, win) {
         7º **${mvps.pontos[6].jogador.summonerName}** - ${mvps.pontos[6].total}
         8º **${mvps.pontos[7].jogador.summonerName}** - ${mvps.pontos[7].total}
         9º **${mvps.pontos[8].jogador.summonerName}** - ${mvps.pontos[8].total}
-        **MVP Inverso ${mvps.pontos[9].jogador.summonerName}** - ${mvps.pontos[9].total}
+        10º **${mvps.pontos[9].jogador.summonerName}** - ${mvps.pontos[9].total}
       `)
       .attachFiles(attachment)
       .setImage(`attachment://${gif}`)
