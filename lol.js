@@ -18,12 +18,13 @@ let matchUltimaPartida = null
 let clientDisc;
 
 exports.lol = (client) => {
-  clientDisc = client;
-  return lol();
+    clientDisc = client;
+    return lol();
 }
 
-exports.getUltimaPartidaJogador = (nomeJogador) => {
-  return getUltimaPartidaJogador(nomeJogador);
+exports.getUltimaPartidaJogador = (client, nomeJogador) => {
+    clientDisc = client;
+    return getUltimaPartidaJogador(nomeJogador);
 }
 
 async function lol() {
@@ -55,13 +56,14 @@ async function lol() {
 }
 
 async function getPartida(match, conta) {
-  const jogadorT = conta || jogador;
-    if (matchUltimaPartida != match) {
+    const jogadorT = conta || jogador;
+    const comando = conta ? true : matchUltimaPartida != match;
+    if (comando) {
         matchUltimaPartida = match
         await axios.get(`https://americas.api.riotgames.com/lol/match/v5/matches/${match}`, headers).then((e) => {
             if (e.status == 200) {
                 participante = e.data.info.participants.find(participante => participante.puuid == jogadorT.puuid)
-                let pontos = getPontos(e.data, participante.win)
+                let pontos = getPontos(e.data)
                 let gif = participante.win ? `ganhamo.gif` : `perdemo.gif`
                 clientDisc.channels.fetch("958513274238935100").then(async geral => {
                   const attachment = new MessageAttachment(`./gifs/${gif}`, gif);
@@ -83,13 +85,14 @@ async function getPartida(match, conta) {
                     .setImage(`attachment://${gif}`)
                     .setThumbnail(`http://ddragon.leagueoflegends.com/cdn/12.1.1/img/champion/${pontos[0].jogador.championName}.png`)
                   return geral.send({ embed })
+
                 })
             }
         })
     }
 }
 
-function getPontos(data, win) {
+function getPontos(data) {
 let maiorKDA = 0
 let maiorDano = 0
 let maiorParticipacao = 0
@@ -235,7 +238,7 @@ async function getUltimaPartidaJogador(nomeJogador) {
     if(conta){
         await axios.get(`https://americas.api.riotgames.com/lol/match/v5/matches/by-puuid/${conta.puuid}/ids?start=0&count=1`, headers).then((e) => {
             if (e.status == 200) {
-              getPartida(e.data[0], conta)
+                getPartida(e.data[0], conta)
             }
         }).catch((err) => {
             console.log(err)

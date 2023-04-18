@@ -30,3 +30,11 @@ vitoria - 5
 
 epicMonsterSteals && epicMonsterStolenWithoutSmite // fazer audio
 
+abilityUses
+enemyChampionImmobilizations
+knockEnemyIntoTeamAndKill
+saveAllyFromDeath
+tookLargeDamageSurvived
+
+skillshotsDodged
+skillshotsHit

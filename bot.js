@@ -71,7 +71,7 @@ async function execute(message) {
   } else if (opt.name == 'stop') {
     return require("./fps.js").stop(voiceChannel)
   } else if(opt.name == 'lol') {
-    return require("./lol.js").getUltimaPartidaJogador(args[2])
+    return require("./lol.js").getUltimaPartidaJogador(Client, args[2])
   }
 
   const audio = fs.existsSync(`./audios/${opt.name}.mp3`) ? `./audios/${opt.name}.mp3` : null;
