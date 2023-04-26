@@ -8,7 +8,7 @@ const { MessageEmbed, MessageAttachment } = require('discord.js');
 app.use(json());
 app.use(cors());
 app.listen(process.env.PORT || 3333);
-const data = require('./contaslol.json')
+const data = require('../configs/contaslol.json')
 const headers = { headers: { "X-Riot-Token": process.env.LOL_KEY } };
 let emPartida = false
 let gameId = null
@@ -66,7 +66,7 @@ async function getPartida(match, conta) {
                 let pontos = getPontos(e.data)
                 let gif = participante.win ? `ganhamo.gif` : `perdemo.gif`
                 clientDisc.channels.fetch("958513274238935100").then(async geral => {
-                  const attachment = new MessageAttachment(`./gifs/${gif}`, gif);
+                  const attachment = new MessageAttachment(`../assets/gifs/${gif}`, gif);
                   const embed = new MessageEmbed()
                     .setTitle(participante.win ? 'VITORIA' : 'DERROTA')
                     .setDescription(`

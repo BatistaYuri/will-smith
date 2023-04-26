@@ -9,14 +9,14 @@ const {
   prefixSong,
   prefixStopSong,
   token,
-} = require('./config.js');
-const { playSong } = require('./lib/brabaLauncher');
+} = require('../config/config.js');
+const { playSong } = require('./brabaLauncher.js');
 require("dotenv").config();
-const commands = require('./commands.json')
+const commands = require('../../configs/commands.json')
 const fs = require('fs');
 
 const cron = require("node-cron");
-const lol = require('./lol.js')
+const lol = require('../../scripts/lol.js')
 const fps = require('./fps.js')
 
 Client.on('ready', () => {
@@ -24,7 +24,7 @@ Client.on('ready', () => {
   Client.channels.fetch("679831039522373635")
     .then(async voice_channel => {
       cron.schedule("*/10 * * * * *", async () => { // cron 1 minuto
-        const teste = require("./lol.js").lol(Client, voice_channel)
+        const teste = require("../../scripts/lol.js").lol(Client, voice_channel)
       }, {
           scheduled: true,
           timezone: "America/Sao_Paulo"
@@ -71,7 +71,7 @@ async function execute(message) {
   } else if (opt.name == 'stop') {
     return require("./fps.js").stop(voiceChannel)
   } else if(opt.name == 'lol') {
-    return require("./lol.js").getUltimaPartidaJogador(Client, args[2])
+    return require("../../scripts/lol.js").getUltimaPartidaJogador(Client, args[2])
   }
 
   const audio = fs.existsSync(`./audios/${opt.name}.mp3`) ? `./audios/${opt.name}.mp3` : null;
