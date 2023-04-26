@@ -2,9 +2,9 @@
   "name": "will-smith",
   "version": "1.0.0",
   "description": "will-smith bot",
-  "main": "scripts/bot.js",
+  "main": "src/bot.js",
   "scripts": {
-    "start": "node scripts/bot.js",
+    "start": "node src/bot.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Yuri Batista <yuri.1115@hotmail.com>",

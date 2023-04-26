@@ -10,12 +10,12 @@ let stoped = true
 
 async function fps(voice_channel) {
     const connection = await voice_channel.join();
-    this.stoped = false
+    stoped = false
     play(connection)
 }
 
 function play(connection){
-    if(!this.stoped){
+    if(!stoped){
         setTimeout(() => {
             connection.play(getRandomAudio(), { volume: 1 });
             play(connection)
@@ -33,6 +33,6 @@ function getRandomAudio() {
 }
 
 function stop(voice_channel) {
-    this.stoped = true
+    stoped = true
     voice_channel.leave();
 }

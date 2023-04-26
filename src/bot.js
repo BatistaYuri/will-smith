@@ -1,30 +1,20 @@
-const {
-  Client: DiscordClient,
-  Intents,
-  MessageEmbed
-} = require('discord.js');
+const { Client: DiscordClient, Intents, MessageEmbed } = require('discord.js');
 const Client = new DiscordClient({ ws: { intents: Intents.GUILD_MESSAGES } });
-const {
-  prefix,
-  prefixSong,
-  prefixStopSong,
-  token,
-} = require('../config/config.js');
-const { playSong } = require('./brabaLauncher.js');
+const { prefix, prefixSong, prefixStopSong, token } = require('./config/config.js');
+const { playSong } = require('./api/brabaLauncher.js');
 require("dotenv").config();
-const commands = require('../../configs/commands.json')
+const commands = require('./config/commands.json');
 const fs = require('fs');
-
 const cron = require("node-cron");
-const lol = require('../../scripts/lol.js')
-const fps = require('./fps.js')
+const lolService = require('./api/services/lolService.js')
+const fpsService = require('./api/services/fpsService.js')
 
 Client.on('ready', () => {
   console.log('Connected');
   Client.channels.fetch("679831039522373635")
     .then(async voice_channel => {
-      cron.schedule("*/10 * * * * *", async () => { // cron 1 minuto
-        const teste = require("../../scripts/lol.js").lol(Client, voice_channel)
+      cron.schedule("*/10 * * * * *", async () => {
+        lolService.lol(Client, voice_channel)
       }, {
           scheduled: true,
           timezone: "America/Sao_Paulo"
@@ -65,13 +55,13 @@ async function execute(message) {
   const opt = commands.find(command => command.name == option);
 
   if (!opt) {
-    return message.channel.send('opção n existe')
+    return message.channel.send('opção não existe')
   } else if (opt.name == 'fps') {
-    return require("./fps.js").fps(voiceChannel)
+    return fpsService.fps(voiceChannel)
   } else if (opt.name == 'stop') {
-    return require("./fps.js").stop(voiceChannel)
+    return fpsService.stop(voiceChannel)
   } else if(opt.name == 'lol') {
-    return require("../../scripts/lol.js").getUltimaPartidaJogador(Client, args[2])
+    return lolService.getLastGame(Client, args[2])
   }
 
   const audio = fs.existsSync(`./audios/${opt.name}.mp3`) ? `./audios/${opt.name}.mp3` : null;
