@@ -1,4 +1,10 @@
-const { Client, GatewayIntentBits, EmbedBuilder } = require("discord.js");
+const {
+  Client,
+  GatewayIntentBits,
+  EmbedBuilder,
+  Collection,
+  Events,
+} = require("discord.js");
 const {
   joinVoiceChannel,
   createAudioPlayer,
@@ -17,23 +23,48 @@ const {
   prefixSong,
   prefixStopSong,
   token,
-  voiceId,
 } = require("./config/config.js");
 const { playSong } = require("./api/brabaLauncher.js");
 require("dotenv").config();
 const commands = require("./config/commands.json");
 const fs = require("fs");
+const path = require("node:path");
 const cron = require("node-cron");
 const lolService = require("./api/services/lolService.js");
 const fpsService = require("./api/services/fpsService.js");
 
+const commandsPath = path.join(__dirname, "commands");
+const commandFiles = fs
+  .readdirSync(commandsPath)
+  .filter((file) => file.endsWith(".js"));
+
+client.commands = new Collection();
+
+for (const file of commandFiles) {
+  const filePath = path.join(commandsPath, file);
+  const command = require(filePath);
+  if ("data" in command && "execute" in command) {
+    client.commands.set(command.data.name, command);
+  } else {
+    console.log(
+      `Esse comando em ${filePath} está com "data" ou "execute ausentes"`
+    );
+  }
+}
+
 client.on("ready", () => {
   console.log("Connected");
-  client.channels.fetch(voiceId).then(async (voice_channel) => {
+  const channelVoice = client.channels.cache.find(
+    (channel) => channel.name == "lol voice"
+  );
+  const channelText = client.channels.cache.find(
+    (channel) => channel.name == "lol"
+  );
+  client.channels.fetch(channelVoice.id).then(async () => {
     cron.schedule(
       "*/10 * * * * *",
       async () => {
-        lolService.lol(client, voice_channel);
+        lolService.lol(client, channelVoice, channelText.id);
       },
       {
         scheduled: true,
@@ -41,6 +72,21 @@ client.on("ready", () => {
       }
     );
   });
+});
+
+client.on(Events.InteractionCreate, async (interaction) => {
+  if (!interaction.isChatInputCommand()) return;
+  const command = interaction.client.commands.get(interaction.commandName);
+  if (!command) {
+    console.error("Comando não encontrado");
+    return;
+  }
+  try {
+    await command.execute(interaction);
+  } catch (error) {
+    console.error(error);
+    await interaction.reply("Houve um erro ao executar esse comando!");
+  }
 });
 
 client.on("messageCreate", async (message) => {
@@ -78,8 +124,6 @@ async function execute(message) {
     return fpsService.fps(voiceChannel);
   } else if (opt.name == "stop") {
     return fpsService.stop(voiceChannel);
-  } else if (opt.name == "lol") {
-    return lolService.getLastGame(client, args[2]);
   }
 
   const audio = fs.existsSync(`./public/audios/${opt.name}.mp3`)

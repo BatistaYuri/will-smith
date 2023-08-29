@@ -1,18 +1,17 @@
 const lolExService = require("./lolExService");
 const players = require("../../config/contaslol.json");
-const { chatId } = require("../../config/config");
 const { AttachmentBuilder, EmbedBuilder } = require("discord.js");
-let gameId = null;
-let player = null;
+let gameId; //BR1_2795172318
+let playerPuuid; // pFQQ_7hEMwy22IY8KsfPsNDrQZiFEW2YioJiTVwzVP0mVMIesP5ILHsoJuF2dUusQ70AAzlbeIvKxw
 let clientDisc;
 
-async function lol(client) {
+async function lol(client, channelVoice, channelTextId) {
   clientDisc = client;
   console.log("gameId = " + gameId);
   if (gameId) {
     const stillInGame = await lolExService.stillInGame(gameId);
     if (!stillInGame) {
-      sendMessage(gameId);
+      sendMessage(gameId, playerPuuid, channelTextId);
       gameId = null;
     }
   } else {
@@ -20,33 +19,70 @@ async function lol(client) {
       const gameIdPlayer = await lolExService.getGame(player.id);
       if (gameIdPlayer) {
         gameId = gameIdPlayer;
-        player = player;
+        playerPuuid = player.puuid;
         return true;
       }
     });
   }
 }
 
-async function getLastGame(client, playerName) {
-  clientDisc = client;
+async function getLastGame(playerName) {
   const player = players.find((player) => player.name == playerName);
   if (player) {
     const lastGameId = await lolExService.getLastGameParticipants(player.puuid);
-    sendMessage(lastGameId, player.puuid);
+    return sendMessageTest(lastGameId, player.puuid);
   }
 }
 
-async function sendMessage(lastGameId, puuid) {
+async function sendMessageTest(lastGameId, puuid) {
   const participants = await lolExService.getParticipants(lastGameId);
   if (participants) {
     const participant = participants.find(
-      (participant) => participant.puuid == (player ? player.puuid : puuid)
+      (participant) => participant.puuid == puuid
     );
     const points = getPoints(participants);
-    player = null;
+    playerPuuid = null;
     if (participant && points) {
       const gif = participant.win ? `ganhamo.gif` : `perdemo.gif`;
-      clientDisc.channels.fetch(chatId).then(async (chat) => {
+      const attachment = new AttachmentBuilder(`./public/gifs/${gif}`, {
+        name: gif,
+      });
+      const embed = new EmbedBuilder()
+        .setTitle(participant.win ? "VITORIA" : "DERROTA")
+        .setDescription(
+          `
+                        1º **${points[0].participant.summonerName}** - ${points[0].total}
+                        2º **${points[1].participant.summonerName}** - ${points[1].total}
+                        3º **${points[2].participant.summonerName}** - ${points[2].total}
+                        4º **${points[3].participant.summonerName}** - ${points[3].total}
+                        5º **${points[4].participant.summonerName}** - ${points[4].total}
+                        6º **${points[5].participant.summonerName}** - ${points[5].total}
+                        7º **${points[6].participant.summonerName}** - ${points[6].total}
+                        8º **${points[7].participant.summonerName}** - ${points[7].total}
+                        9º **${points[8].participant.summonerName}** - ${points[8].total}
+                        10º **${points[9].participant.summonerName}** - ${points[9].total}
+                    `
+        )
+        //.setImage(`attachment://${gif}`)
+        .setThumbnail(
+          `http://ddragon.leagueoflegends.com/cdn/12.1.1/img/champion/${points[0].participant.championName}.png`
+        );
+      return { embeds: [embed] }; //files: [attachment]
+    }
+  }
+}
+
+async function sendMessage(lastGameId, puuid, channelTextId) {
+  const participants = await lolExService.getParticipants(lastGameId);
+  if (participants) {
+    const participant = participants.find(
+      (participant) => participant.puuid == puuid
+    );
+    const points = getPoints(participants);
+    playerPuuid = null;
+    if (participant && points) {
+      const gif = participant.win ? `ganhamo.gif` : `perdemo.gif`;
+      clientDisc.channels.fetch(channelTextId).then(async (chat) => {
         const attachment = new AttachmentBuilder(`./public/gifs/${gif}`, {
           name: gif,
         });
