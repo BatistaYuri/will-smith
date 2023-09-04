@@ -15,14 +15,14 @@ async function lol(client, channelVoice, channelTextId) {
       gameId = null;
     }
   } else {
-    players.some(async (player) => {
+    for (const player of players) {
       const gameIdPlayer = await lolExService.getGame(player.id);
       if (gameIdPlayer) {
         gameId = gameIdPlayer;
         playerPuuid = player.puuid;
-        return true;
+        break;
       }
-    });
+    }
   }
 }
 
@@ -128,7 +128,6 @@ function getPoints(participants) {
       totalDamageDealtToChampions,
       visionScore,
       damageDealtToTurrets,
-      participacaoAbates,
       totalHealsOnTeammates,
       totalDamageShieldedOnTeammates,
       totalDamageTaken,
@@ -136,7 +135,8 @@ function getPoints(participants) {
       assists,
       deaths,
     } = participant;
-    const kda = (kills + assists) / (deaths == 0 ? 1 : deaths);
+    const participacaoAbates = kills + assists;
+    const kda = participacaoAbates / (deaths == 0 ? 1 : deaths);
     maiorDano =
       totalDamageDealtToChampions > maiorDano
         ? totalDamageDealtToChampions
