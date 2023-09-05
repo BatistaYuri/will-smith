@@ -3,8 +3,8 @@ module.exports = {
   prefix: "-w",
   prefixSong: "-toca",
   prefixStopSong: "-sai",
-  token: process.env.TOKEN_TEST,
+  token: process.env.TOKEN,
   keyLol: process.env.LOL_KEY,
-  clientId: process.env.CLIENT_ID_TEST,
-  guildId: process.env.GUILD_ID_TEST,
+  clientId: process.env.CLIENT_ID,
+  guildId: process.env.GUILD_ID,
 };
