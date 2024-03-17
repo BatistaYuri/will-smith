@@ -6,7 +6,7 @@ on:
 
 jobs:
   CI:
-    runs-on: linux-arm
+    runs-on: arm32v7
 
     steps:
 
