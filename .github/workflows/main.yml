@@ -6,7 +6,7 @@ on:
 
 jobs:
   CI:
-    runs-on: arm32v7
+    runs-on: ubuntu-latest
 
     steps:
 
