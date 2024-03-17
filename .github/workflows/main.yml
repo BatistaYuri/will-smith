@@ -22,7 +22,6 @@ jobs:
         uses: docker/build-push-action@v5.3.0
         with:
           context: .
-          file: .
           push: true
           tags: |
             yuribatista/will-smith:v1
