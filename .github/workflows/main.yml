@@ -5,7 +5,7 @@ on:
     branches: [main]
 
 jobs:
-  CI:
+  DockerImage:
     runs-on: ubuntu-latest
 
     steps:
@@ -22,9 +22,5 @@ jobs:
         uses: docker/build-push-action@v5.3.0
         with:
           context: .
-          file: .
           push: true
-          tags: |
-            yuribatista/will-smith:v1
-            yuribatista/will-smith:latest
-      
+          tags: yuribatista/will-smith:latest
