@@ -13,7 +13,7 @@ async function getGame(playerId) {
   let gameId = null;
   await axios
     .get(
-      `https://br1.api.riotgames.com/lol/spectator/v4/active-games/by-summoner/${playerId}`,
+      `https://br1.api.riotgames.com/lol/spectator/v5/active-games/by-summoner/${playerId}`,
       headers
     )
     .then((e) => {
