@@ -16,7 +16,7 @@ async function lol(client, channelVoice, channelTextId) {
     }
   } else {
     for (const player of players) {
-      const gameIdPlayer = await lolExService.getGame(player.id);
+      const gameIdPlayer = await lolExService.getGame(player.puuid);
       if (gameIdPlayer) {
         gameId = gameIdPlayer;
         playerPuuid = player.puuid;

@@ -19,7 +19,7 @@ async function getGame(playerId) {
     .then((e) => {
       gameId = e.status == 200 && `BR1_${e.data.gameId}`;
     })
-    .catch(() => {});
+    .catch((e) => {console.log(e)});
   return gameId;
 }
 
