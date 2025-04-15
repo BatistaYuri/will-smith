@@ -51,16 +51,16 @@ async function sendMessageTest(lastGameId, puuid) {
         .setTitle(participant.win ? "VITORIA" : "DERROTA")
         .setDescription(
           `
-                        1º **${points[0].participant.summonerName}** - ${points[0].total}
-                        2º **${points[1].participant.summonerName}** - ${points[1].total}
-                        3º **${points[2].participant.summonerName}** - ${points[2].total}
-                        4º **${points[3].participant.summonerName}** - ${points[3].total}
-                        5º **${points[4].participant.summonerName}** - ${points[4].total}
-                        6º **${points[5].participant.summonerName}** - ${points[5].total}
-                        7º **${points[6].participant.summonerName}** - ${points[6].total}
-                        8º **${points[7].participant.summonerName}** - ${points[7].total}
-                        9º **${points[8].participant.summonerName}** - ${points[8].total}
-                        10º **${points[9].participant.summonerName}** - ${points[9].total}
+                        1º **${points[0].participant.riotIdGameName}** - ${points[0].total}
+                        2º **${points[1].participant.riotIdGameName}** - ${points[1].total}
+                        3º **${points[2].participant.riotIdGameName}** - ${points[2].total}
+                        4º **${points[3].participant.riotIdGameName}** - ${points[3].total}
+                        5º **${points[4].participant.riotIdGameName}** - ${points[4].total}
+                        6º **${points[5].participant.riotIdGameName}** - ${points[5].total}
+                        7º **${points[6].participant.riotIdGameName}** - ${points[6].total}
+                        8º **${points[7].participant.riotIdGameName}** - ${points[7].total}
+                        9º **${points[8].participant.riotIdGameName}** - ${points[8].total}
+                        10º **${points[9].participant.riotIdGameName}** - ${points[9].total}
                     `
         )
         //.setImage(`attachment://${gif}`)
@@ -90,16 +90,16 @@ async function sendMessage(lastGameId, puuid, channelTextId) {
           .setTitle(participant.win ? "VITORIA" : "DERROTA")
           .setDescription(
             `
-                        1º **${points[0].participant.summonerName}** - ${points[0].total}
-                        2º **${points[1].participant.summonerName}** - ${points[1].total}
-                        3º **${points[2].participant.summonerName}** - ${points[2].total}
-                        4º **${points[3].participant.summonerName}** - ${points[3].total}
-                        5º **${points[4].participant.summonerName}** - ${points[4].total}
-                        6º **${points[5].participant.summonerName}** - ${points[5].total}
-                        7º **${points[6].participant.summonerName}** - ${points[6].total}
-                        8º **${points[7].participant.summonerName}** - ${points[7].total}
-                        9º **${points[8].participant.summonerName}** - ${points[8].total}
-                        10º **${points[9].participant.summonerName}** - ${points[9].total}
+                        1º **${points[0].participant.riotIdGameName}** - ${points[0].total}
+                        2º **${points[1].participant.riotIdGameName}** - ${points[1].total}
+                        3º **${points[2].participant.riotIdGameName}** - ${points[2].total}
+                        4º **${points[3].participant.riotIdGameName}** - ${points[3].total}
+                        5º **${points[4].participant.riotIdGameName}** - ${points[4].total}
+                        6º **${points[5].participant.riotIdGameName}** - ${points[5].total}
+                        7º **${points[6].participant.riotIdGameName}** - ${points[6].total}
+                        8º **${points[7].participant.riotIdGameName}** - ${points[7].total}
+                        9º **${points[8].participant.riotIdGameName}** - ${points[8].total}
+                        10º **${points[9].participant.riotIdGameName}** - ${points[9].total}
                     `
           )
           .setImage(`attachment://${gif}`)
