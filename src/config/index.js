@@ -1,21 +1,29 @@
 const path = require('path');
+const fs = require('fs');
 
 /**
  * Configurações centralizadas do bot
  * Carrega o arquivo .env correto baseado no ambiente
+ * No Discloud, as variáveis são passadas diretamente pelo sistema
  */
 
 const isDev = process.env.NODE_ENV === 'development';
 const envFile = isDev ? '.env.development' : '.env.production';
+const envPath = path.resolve(process.cwd(), envFile);
 
-// Carrega o arquivo .env correto
-require('dotenv').config({
-  path: path.resolve(process.cwd(), envFile),
-});
+// Carrega o arquivo .env se existir (desenvolvimento local)
+// No Discloud, as variáveis já estão no process.env
+if (fs.existsSync(envPath)) {
+  require('dotenv').config({ path: envPath });
+  console.log(`📄 Usando: ${envFile}`);
+} else {
+  // Tenta carregar .env genérico ou usa variáveis do sistema
+  require('dotenv').config();
+  console.log('📄 Usando variáveis de ambiente do sistema');
+}
 
 // Log do ambiente atual
 console.log(`🔧 Ambiente: ${isDev ? 'DESENVOLVIMENTO' : 'PRODUÇÃO'}`);
-console.log(`📄 Usando: ${envFile}`);
 
 module.exports = {
   // Ambiente

@@ -1,0 +1,23 @@
+# Dependências (serão instaladas pelo Discloud)
+node_modules/
+
+# Arquivos de desenvolvimento
+.env.development
+.env.local
+*.log
+logs/
+
+# Arquivos de configuração local
+.git/
+.gitignore
+.vscode/
+.cursor/
+
+# Docker (não necessário no Discloud)
+Dockerfile
+docker-compose.yml
+
+# Outros
+replit.nix
+*.md
+
