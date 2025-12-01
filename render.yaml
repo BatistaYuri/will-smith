@@ -1,0 +1,17 @@
+services:
+  - type: worker
+    name: will-smith-bot
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    envVars:
+      - key: TOKEN
+        sync: false
+      - key: CLIENT_ID
+        sync: false
+      - key: GUILD_ID
+        sync: false
+      - key: LOL_KEY
+        sync: false
+      - key: NODE_ENV
+        value: production
+

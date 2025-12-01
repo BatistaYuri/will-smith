@@ -3,6 +3,9 @@
 	"version": "1.0.0",
 	"description": "will-smith bot",
 	"main": "src/bot.js",
+	"engines": {
+		"node": ">=18.0.0"
+	},
 	"scripts": {
 		"start": "node src/bot.js",
 		"dev": "cross-env NODE_ENV=development nodemon src/bot.js",

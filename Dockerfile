@@ -1,12 +1,18 @@
-FROM docker.io/node:18-alpine
+FROM node:18-alpine
+
+# Instala ffmpeg para áudio
+RUN apk add --no-cache ffmpeg
 
 WORKDIR /usr/app
 
+# Copia arquivos de dependências
 COPY package*.json ./
-RUN npm install
 
+# Instala dependências de produção
+RUN npm ci --only=production
+
+# Copia o resto do código
 COPY . .
 
-EXPOSE 3000
-
+# Comando para iniciar o bot
 CMD ["npm", "start"]
