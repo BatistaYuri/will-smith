@@ -1,6 +1,7 @@
 const lolApi = require('./lolApi');
 const { calculateRanking } = require('./lolPoints');
 const { createMatchResultEmbed } = require('../../utils/embedBuilder');
+const { playAudio } = require('../audio/audioService');
 const players = require('../../config/players.json');
 const logger = require('../../utils/logger');
 
@@ -32,7 +33,7 @@ const checkGameStatus = async (client, voiceChannel, textChannelId) => {
   logger.debug(`Game ID atual: ${gameTracker.currentGameId}`);
 
   if (gameTracker.isTracking()) {
-    await handleActiveGame(client, textChannelId);
+    await handleActiveGame(client, voiceChannel, textChannelId);
   } else {
     await searchForActiveGames();
   }
@@ -41,13 +42,14 @@ const checkGameStatus = async (client, voiceChannel, textChannelId) => {
 /**
  * Gerencia um jogo ativo
  */
-const handleActiveGame = async (client, textChannelId) => {
+const handleActiveGame = async (client, voiceChannel, textChannelId) => {
   const stillInGame = await lolApi.isGameInProgress(gameTracker.currentGameId);
   
   if (!stillInGame) {
     logger.info('Jogo finalizado, enviando resultado');
     await sendMatchResult(
       client,
+      voiceChannel,
       gameTracker.currentGameId,
       gameTracker.currentPlayerPuuid,
       textChannelId
@@ -75,7 +77,7 @@ const searchForActiveGames = async () => {
 /**
  * Envia o resultado da partida para o canal
  */
-const sendMatchResult = async (client, gameId, puuid, textChannelId) => {
+const sendMatchResult = async (client, voiceChannel, gameId, puuid, textChannelId) => {
   const participants = await lolApi.getMatchParticipants(gameId);
   
   if (!participants) {
@@ -105,6 +107,13 @@ const sendMatchResult = async (client, gameId, puuid, textChannelId) => {
       components,
     });
     logger.success('Resultado da partida enviado');
+
+    // Toca áudio de vitória ou derrota automaticamente
+    if (voiceChannel) {
+      const audioName = player.win ? 'ganhamo' : 'perdemo';
+      logger.info(`Tocando áudio automático: ${audioName}`);
+      await playAudio(voiceChannel, audioName);
+    }
   } catch (error) {
     logger.error('Erro ao enviar resultado da partida', error);
   }

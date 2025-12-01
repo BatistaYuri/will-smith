@@ -66,7 +66,9 @@ const processQueue = async (guildId) => {
   
   if (state.queue.length === 0) {
     state.isPlaying = false;
-    resetDisconnectTimer(guildId);
+    // Sai do canal imediatamente quando terminar os áudios
+    logger.debug('Fila vazia, desconectando do canal');
+    stopAudio(guildId);
     return;
   }
   
@@ -116,8 +118,8 @@ const playAudio = async (voiceChannel, audioName, folder = 'audios') => {
       });
     }
 
-    // Aguarda a conexão estar pronta
-    await entersState(state.connection, VoiceConnectionStatus.Ready, 5000);
+    // Aguarda a conexão estar pronta (30 segundos de timeout)
+    await entersState(state.connection, VoiceConnectionStatus.Ready, 30_000);
 
     // Cria ou reutiliza o player
     if (!state.player) {

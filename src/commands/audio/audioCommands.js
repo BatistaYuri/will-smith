@@ -63,6 +63,9 @@ const createAudioCommand = (config) => {
         return interaction.reply({ embeds: [embed], ephemeral: true });
       }
 
+      // Defer para ganhar mais tempo (evita timeout de 3 segundos)
+      await interaction.deferReply();
+
       const result = await playAudio(voiceChannel, name);
 
       if (!result.success) {
@@ -70,7 +73,7 @@ const createAudioCommand = (config) => {
           'Erro ao tocar o áudio!',
           result.error || 'Verifique se o arquivo de áudio existe.'
         );
-        return interaction.reply({ embeds: [embed], ephemeral: true });
+        return interaction.editReply({ embeds: [embed] });
       }
 
       // Monta a resposta
@@ -96,7 +99,7 @@ const createAudioCommand = (config) => {
         }
       }
 
-      return interaction.reply(replyOptions);
+      return interaction.editReply(replyOptions);
     },
   };
 };
