@@ -1,72 +1,67 @@
-const { Client, GatewayIntentBits, Collection, Events } = require("discord.js");
+/**
+ * Will Smith Bot
+ * Bot do Discord para monitoramento de partidas de LoL e reprodução de áudios
+ */
+
+require('dotenv').config();
+
+const { Client, GatewayIntentBits, Collection } = require('discord.js');
+const { loadCommands } = require('./handlers/commandHandler');
+const { loadEvents } = require('./handlers/eventHandler');
+const { token, isDev, env } = require('./config');
+const logger = require('./utils/logger');
+
+/**
+ * Configuração do cliente Discord
+ */
 const client = new Client({
-  intents: [
-    GatewayIntentBits.Guilds,
-    GatewayIntentBits.GuildMessages,
-    GatewayIntentBits.MessageContent,
-  ],
+	intents: [
+		GatewayIntentBits.Guilds,
+		GatewayIntentBits.GuildMessages,
+		GatewayIntentBits.MessageContent,
+		GatewayIntentBits.GuildVoiceStates,
+	],
 });
-const { token } = require("./config/config.js");
-require("dotenv").config();
-const fs = require("fs");
-const path = require("node:path");
-const cron = require("node-cron");
-const lolService = require("./api/services/lolService.js");
 
-const commandsPath = path.join(__dirname, "commands");
-const commandFiles = fs
-  .readdirSync(commandsPath)
-  .filter((file) => file.endsWith(".js"));
-
+// Coleção de comandos
 client.commands = new Collection();
 
-for (const file of commandFiles) {
-  const filePath = path.join(commandsPath, file);
-  const command = require(filePath);
-  if ("data" in command && "execute" in command) {
-    client.commands.set(command.data.name, command);
-  } else {
-    console.log(
-      `Esse comando em ${filePath} está com "data" ou "execute ausentes"`
-    );
-  }
-}
+/**
+ * Inicializa o bot
+ */
+const initialize = async () => {
+	console.log('');
+	console.log('╔════════════════════════════════════════╗');
+	console.log('║          🤖 WILL SMITH BOT             ║');
+	console.log(`║     Ambiente: ${isDev ? '🔧 DESENVOLVIMENTO' : '🚀 PRODUÇÃO'}       ║`);
+	console.log('╚════════════════════════════════════════╝');
+	console.log('');
 
-client.on("ready", () => {
-  console.log("Connected");
-  const channelVoice = client.channels.cache.find(
-    (channel) => channel.name == "Amantes do Alisson"
-  );
-  const channelText = client.channels.cache.find(
-    (channel) => channel.name == "lol"
-  );
-  client.channels.fetch(channelVoice.id).then(async () => {
-    cron.schedule(
-      "*/10 * * * * *",
-      async () => {
-        lolService.lol(client, channelVoice, channelText.id);
-      },
-      {
-        scheduled: true,
-        timezone: "America/Sao_Paulo",
-      }
-    );
-  });
+	logger.info(`Iniciando em modo ${env}...`);
+
+	// Carrega comandos e eventos
+	loadCommands(client);
+	loadEvents(client);
+
+	// Conecta ao Discord
+	try {
+		await client.login(token);
+	} catch (error) {
+		logger.error('Erro ao conectar ao Discord', error);
+		logger.error('Verifique se o TOKEN está correto no .env');
+		process.exit(1);
+	}
+};
+
+// Tratamento de erros não capturados
+process.on('unhandledRejection', (error) => {
+	logger.error('Unhandled Rejection', error);
 });
 
-client.on(Events.InteractionCreate, async (interaction) => {
-  if (!interaction.isChatInputCommand()) return;
-  const command = interaction.client.commands.get(interaction.commandName);
-  if (!command) {
-    console.error("Comando não encontrado");
-    return;
-  }
-  try {
-    await command.execute(interaction);
-  } catch (error) {
-    console.error(error);
-    await interaction.reply("Houve um erro ao executar esse comando!");
-  }
+process.on('uncaughtException', (error) => {
+	logger.error('Uncaught Exception', error);
+	process.exit(1);
 });
 
-client.login(token);
+// Inicia o bot
+initialize();
