@@ -5,11 +5,35 @@
 
 require('dotenv').config();
 
+const http = require('http');
 const { Client, GatewayIntentBits, Collection } = require('discord.js');
 const { loadCommands } = require('./handlers/commandHandler');
 const { loadEvents } = require('./handlers/eventHandler');
 const { token, isDev, env } = require('./config');
 const logger = require('./utils/logger');
+
+/**
+ * Servidor HTTP para health check (necessário para Render Web Service gratuito)
+ */
+const PORT = process.env.PORT || 3000;
+const server = http.createServer((req, res) => {
+	if (req.url === '/health' || req.url === '/') {
+		res.writeHead(200, { 'Content-Type': 'application/json' });
+		res.end(JSON.stringify({ 
+			status: 'ok', 
+			bot: 'Will Smith Bot',
+			uptime: process.uptime(),
+			memory: process.memoryUsage().rss / 1024 / 1024
+		}));
+	} else {
+		res.writeHead(404);
+		res.end('Not Found');
+	}
+});
+
+server.listen(PORT, () => {
+	logger.info(`Servidor HTTP rodando na porta ${PORT}`);
+});
 
 /**
  * Configuração do cliente Discord

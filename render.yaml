@@ -1,8 +1,10 @@
 services:
-  - type: worker
+  - type: web
     name: will-smith-bot
     runtime: docker
     dockerfilePath: ./Dockerfile
+    plan: free
+    healthCheckPath: /health
     envVars:
       - key: TOKEN
         sync: false

@@ -14,5 +14,8 @@ RUN npm ci --only=production
 # Copia o resto do código
 COPY . .
 
+# Expõe a porta para o Render
+EXPOSE 10000
+
 # Comando para iniciar o bot
 CMD ["npm", "start"]
