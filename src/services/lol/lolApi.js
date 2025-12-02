@@ -59,29 +59,50 @@ const getActiveGame = async (puuid) => {
 /**
  * Verifica se um jogo ainda está em andamento
  * @param {string} gameId - ID do jogo
- * @returns {Promise<boolean>} true se ainda está em andamento
+ * @param {string} puuid - PUUID do jogador (para verificar na Spectator API)
+ * @returns {Promise<{inProgress: boolean, hasData: boolean}>} Status do jogo
  */
-const isGameInProgress = async (gameId) => {
-  // Se já temos os dados da partida no cache, ela terminou
+const isGameInProgress = async (gameId, puuid = null) => {
+  // Se já temos os dados da partida no cache, ela terminou com dados
   const cacheKey = `match_${gameId}`;
   if (matchCache.has(cacheKey)) {
-    return false;
+    return { inProgress: false, hasData: true };
   }
 
   try {
     const url = `${RIOT_API.AMERICAS}${ENDPOINTS.MATCH}/${gameId}`;
     const response = await makeRequest(url);
     
-    // Se conseguiu buscar os dados, o jogo terminou
+    // Se conseguiu buscar os dados, o jogo terminou com dados
     if (response.status === 200) {
-      // Cacheia os dados da partida
       matchCache.set(cacheKey, response.data);
-      return false;
+      return { inProgress: false, hasData: true };
     }
-    return true;
+    return { inProgress: true, hasData: false };
   } catch (error) {
-    // Se deu erro 404, o jogo ainda está em andamento
-    return true;
+    // Match API retornou 404 - pode ser:
+    // 1. Jogo ainda em andamento
+    // 2. Jogo terminou mas não tem dados (ARAM Desordem, Arena, etc)
+    
+    // Verifica na Spectator API se o jogador ainda está em jogo
+    if (puuid) {
+      try {
+        const spectatorUrl = `${RIOT_API.BR}${ENDPOINTS.SPECTATOR}/${puuid}`;
+        await makeRequest(spectatorUrl);
+        // Se não deu erro, jogador ainda está em jogo
+        return { inProgress: true, hasData: false };
+      } catch (spectatorError) {
+        // 404 na Spectator = jogador não está mais em jogo
+        // Jogo terminou, mas sem dados disponíveis (modo de evento)
+        if (spectatorError.response?.status === 404) {
+          logger.warn(`Partida ${gameId} terminou sem dados (modo de evento?)`);
+          return { inProgress: false, hasData: false };
+        }
+      }
+    }
+    
+    // Se não tem puuid para verificar, assume em andamento
+    return { inProgress: true, hasData: false };
   }
 };
 

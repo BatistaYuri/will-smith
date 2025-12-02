@@ -43,17 +43,34 @@ const checkGameStatus = async (client, voiceChannel, textChannelId) => {
  * Gerencia um jogo ativo
  */
 const handleActiveGame = async (client, voiceChannel, textChannelId) => {
-  const stillInGame = await lolApi.isGameInProgress(gameTracker.currentGameId);
+  const gameStatus = await lolApi.isGameInProgress(
+    gameTracker.currentGameId,
+    gameTracker.currentPlayerPuuid
+  );
   
-  if (!stillInGame) {
-    logger.info('Jogo finalizado, enviando resultado');
-    await sendMatchResult(
-      client,
-      voiceChannel,
-      gameTracker.currentGameId,
-      gameTracker.currentPlayerPuuid,
-      textChannelId
-    );
+  if (!gameStatus.inProgress) {
+    if (gameStatus.hasData) {
+      // Jogo terminou e tem dados disponíveis
+      logger.info('Jogo finalizado, enviando resultado');
+      await sendMatchResult(
+        client,
+        voiceChannel,
+        gameTracker.currentGameId,
+        gameTracker.currentPlayerPuuid,
+        textChannelId
+      );
+    } else {
+      // Jogo terminou mas sem dados (ARAM Desordem, Arena, etc)
+      logger.warn('Jogo finalizado sem dados disponíveis (modo de evento)');
+      
+      // Notifica no canal de texto
+      try {
+        const channel = await client.channels.fetch(textChannelId);
+        await channel.send('⚠️ Partida finalizada, mas os dados não estão disponíveis (modos de evento como ARAM Desordem e Arena não são rastreados pela API da Riot).');
+      } catch (error) {
+        logger.error('Erro ao enviar notificação', error);
+      }
+    }
     gameTracker.reset();
   }
 };
