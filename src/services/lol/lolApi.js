@@ -149,17 +149,12 @@ const getMatchData = async (gameId) => {
  * @returns {Promise<string|null>} ID da última partida ou null
  */
 const getLastMatchId = async (puuid) => {
-  // Cache curto (1 minuto)
-  const cacheKey = `last_match_${puuid}`;
-  const cached = playerCache.get(cacheKey);
-  if (cached) return cached;
-
+  // Sem cache - sempre busca a partida mais recente
   try {
     const url = `${RIOT_API.AMERICAS}${ENDPOINTS.MATCH_BY_PUUID}/${puuid}/ids?start=0&count=1`;
     const response = await makeRequest(url);
     
     if (response.status === 200 && response.data?.[0]) {
-      playerCache.set(cacheKey, response.data[0]);
       return response.data[0];
     }
     return null;
