@@ -49,8 +49,31 @@ module.exports = {
       .map((entry) => entry.label);
 
     const states = [];
+    const gatewayEvents = [];
     let connection = null;
     let connectionResult = 'Não testado';
+    let gotVoiceStateUpdate = false;
+    let gotVoiceServerUpdate = false;
+
+    const rawHandler = (packet) => {
+      if (!packet?.t) return;
+
+      if (packet.t === 'VOICE_SERVER_UPDATE' && packet.d?.guild_id === guild.id) {
+        gotVoiceServerUpdate = true;
+        gatewayEvents.push('VOICE_SERVER_UPDATE');
+      }
+
+      if (
+        packet.t === 'VOICE_STATE_UPDATE' &&
+        packet.d?.guild_id === guild.id &&
+        packet.d?.user_id === botMember.id
+      ) {
+        gotVoiceStateUpdate = true;
+        gatewayEvents.push('VOICE_STATE_UPDATE(bot)');
+      }
+    };
+
+    interaction.client.on('raw', rawHandler);
 
     if (missingPermissions.length > 0) {
       connectionResult = `Pulado: faltam permissões (${missingPermissions.join(', ')})`;
@@ -84,6 +107,8 @@ module.exports = {
         } catch (_error) {
           // Ignore cleanup failures.
         }
+
+        interaction.client.off('raw', rawHandler);
       }
     }
 
@@ -92,6 +117,11 @@ module.exports = {
       .join('\n');
 
     const statesText = states.length > 0 ? states.join('\n') : 'Sem transições capturadas';
+    const gatewayText = [
+      `VOICE_STATE_UPDATE(bot): ${gotVoiceStateUpdate ? '✅' : '❌'}`,
+      `VOICE_SERVER_UPDATE: ${gotVoiceServerUpdate ? '✅' : '❌'}`,
+      `Eventos: ${gatewayEvents.length > 0 ? gatewayEvents.join(', ') : 'nenhum'}`,
+    ].join('\n');
 
     const embed = new EmbedBuilder()
       .setColor(missingPermissions.length > 0 ? 0xffcc00 : 0x0099ff)
@@ -115,6 +145,11 @@ module.exports = {
         {
           name: 'Transições de estado',
           value: statesText.slice(0, 1000),
+          inline: false,
+        },
+        {
+          name: 'Eventos de gateway',
+          value: gatewayText.slice(0, 1000),
           inline: false,
         }
       )

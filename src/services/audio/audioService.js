@@ -1,5 +1,6 @@
 const {
   joinVoiceChannel,
+  getVoiceConnection,
   createAudioPlayer,
   createAudioResource,
   AudioPlayerStatus,
@@ -120,6 +121,17 @@ const getVoicePermissionError = async (voiceChannel) => {
 
 const ensureReadyConnection = async (state, voiceChannel) => {
   const requestedChannelId = voiceChannel.id;
+  const guildId = voiceChannel.guild.id;
+  const globalConnection = getVoiceConnection(guildId);
+
+  if (globalConnection && globalConnection !== state.connection) {
+    logger.warn('Conexão global órfã detectada, destruindo antes de reconectar', {
+      guildId,
+      oldChannelId: globalConnection.joinConfig?.channelId,
+    });
+    destroyConnectionSafely(globalConnection);
+  }
+
   const currentConnection = state.connection;
   const currentChannelId = currentConnection?.joinConfig?.channelId;
   const currentStatus = currentConnection?.state?.status;
