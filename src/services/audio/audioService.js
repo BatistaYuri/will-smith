@@ -6,6 +6,7 @@ const {
   VoiceConnectionStatus,
   entersState,
 } = require('@discordjs/voice');
+const { PermissionsBitField } = require('discord.js');
 const path = require('path');
 const { MEDIA_PATHS } = require('../../config/constants');
 const logger = require('../../utils/logger');
@@ -20,6 +21,22 @@ const AUTO_DISCONNECT_TIMEOUT = 5 * 60 * 1000; // 5 minutos de inatividade
 
 // Estado por guild
 const guildState = new Map();
+
+const CONNECTION_TIMEOUT_MS = 15000;
+
+const normalizeAudioError = (error) => {
+  if (!error) return 'Erro desconhecido ao conectar no canal de voz.';
+
+  if (error.name === 'AbortError') {
+    return 'Não consegui conectar no canal de voz a tempo. Verifique permissões e tente novamente.';
+  }
+
+  if (error.code === 'VOICE_CONNECTION_TIMEOUT') {
+    return 'Conexão de voz expirou. Tente novamente em alguns segundos.';
+  }
+
+  return error.message || String(error);
+};
 
 /**
  * Obtém ou cria o estado de uma guild
@@ -36,6 +53,110 @@ const getGuildState = (guildId) => {
     });
   }
   return guildState.get(guildId);
+};
+
+const destroyConnectionSafely = (connection) => {
+  try {
+    connection?.destroy();
+  } catch (_error) {
+    // Ignora falhas de limpeza.
+  }
+};
+
+const createVoiceConnection = (voiceChannel) => {
+  const connection = joinVoiceChannel({
+    channelId: voiceChannel.id,
+    guildId: voiceChannel.guild.id,
+    adapterCreator: voiceChannel.guild.voiceAdapterCreator,
+    selfDeaf: true,
+    selfMute: false,
+  });
+
+  connection.on('stateChange', (oldState, newState) => {
+    logger.debug('Voice connection state change', {
+      guildId: voiceChannel.guild.id,
+      channelId: voiceChannel.id,
+      from: oldState?.status,
+      to: newState?.status,
+    });
+  });
+
+  return connection;
+};
+
+const getVoicePermissionError = async (voiceChannel) => {
+  const botMember =
+    voiceChannel.guild.members.me ||
+    (await voiceChannel.guild.members.fetchMe());
+
+  const permissions = voiceChannel.permissionsFor(botMember);
+
+  if (!permissions) {
+    return 'Não consegui validar permissões no canal de voz.';
+  }
+
+  const missing = [];
+
+  if (!permissions.has(PermissionsBitField.Flags.ViewChannel)) {
+    missing.push('Ver Canal');
+  }
+  if (!permissions.has(PermissionsBitField.Flags.Connect)) {
+    missing.push('Conectar');
+  }
+  if (!permissions.has(PermissionsBitField.Flags.Speak)) {
+    missing.push('Falar');
+  }
+
+  if (missing.length > 0) {
+    return `Faltam permissões no canal de voz: ${missing.join(', ')}.`;
+  }
+
+  if (voiceChannel.full && !voiceChannel.members.has(botMember.id)) {
+    return 'Canal de voz lotado para o bot.';
+  }
+
+  return null;
+};
+
+const ensureReadyConnection = async (state, voiceChannel) => {
+  const requestedChannelId = voiceChannel.id;
+  const currentConnection = state.connection;
+  const currentChannelId = currentConnection?.joinConfig?.channelId;
+  const currentStatus = currentConnection?.state?.status;
+
+  const mustRecreate =
+    !currentConnection ||
+    currentStatus === VoiceConnectionStatus.Destroyed ||
+    currentStatus === VoiceConnectionStatus.Disconnected ||
+    currentChannelId !== requestedChannelId;
+
+  if (mustRecreate) {
+    destroyConnectionSafely(currentConnection);
+    state.connection = createVoiceConnection(voiceChannel);
+  }
+
+  try {
+    await entersState(state.connection, VoiceConnectionStatus.Ready, CONNECTION_TIMEOUT_MS);
+    return state.connection;
+  } catch (firstError) {
+    logger.warn('Falha ao conectar na voz, tentando reconectar', {
+      guildId: voiceChannel.guild.id,
+      channelId: requestedChannelId,
+      status: state.connection?.state?.status,
+      error: firstError.message,
+    });
+
+    destroyConnectionSafely(state.connection);
+    state.connection = createVoiceConnection(voiceChannel);
+
+    try {
+      await entersState(state.connection, VoiceConnectionStatus.Ready, CONNECTION_TIMEOUT_MS);
+      return state.connection;
+    } catch (secondError) {
+      secondError.code = 'VOICE_CONNECTION_TIMEOUT';
+      throw secondError;
+    }
+  }
 };
 
 /**
@@ -108,18 +229,18 @@ const playAudio = async (voiceChannel, audioName, folder = 'audios') => {
   try {
     const guildId = voiceChannel.guild.id;
     const state = getGuildState(guildId);
-    
-    // Cria ou reutiliza a conexão
-    if (!state.connection || state.connection.state.status === VoiceConnectionStatus.Destroyed) {
-      state.connection = joinVoiceChannel({
+
+    const permissionError = await getVoicePermissionError(voiceChannel);
+    if (permissionError) {
+      logger.warn('Sem permissão para conectar/tocar no canal de voz', {
+        guildId,
         channelId: voiceChannel.id,
-        guildId: guildId,
-        adapterCreator: voiceChannel.guild.voiceAdapterCreator,
+        error: permissionError,
       });
+      return { success: false, error: permissionError };
     }
 
-    // Aguarda a conexão estar pronta (30 segundos de timeout)
-    await entersState(state.connection, VoiceConnectionStatus.Ready, 30_000);
+    await ensureReadyConnection(state, voiceChannel);
 
     // Cria ou reutiliza o player
     if (!state.player) {
@@ -159,7 +280,7 @@ const playAudio = async (voiceChannel, audioName, folder = 'audios') => {
     };
   } catch (error) {
     logger.error('Erro ao tocar áudio', error);
-    return { success: false, error: error.message };
+    return { success: false, error: normalizeAudioError(error) };
   }
 };
 

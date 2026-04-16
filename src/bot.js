@@ -6,11 +6,20 @@
 require('dotenv').config();
 
 const http = require('http');
+const dns = require('dns');
 const { Client, GatewayIntentBits, Collection } = require('discord.js');
 const { loadCommands } = require('./handlers/commandHandler');
 const { loadEvents } = require('./handlers/eventHandler');
 const { token, isDev, env } = require('./config');
 const logger = require('./utils/logger');
+
+// Em alguns ambientes Linux/hosts remotos, IPv6 parcial quebra handshake de voz.
+// Prioriza IPv4 para reduzir AbortError em conexão com Voice Gateway.
+try {
+	dns.setDefaultResultOrder('ipv4first');
+} catch (_error) {
+	// Ignora se a opção não estiver disponível na versão do Node.
+}
 
 /**
  * Servidor HTTP para health check (necessário para Render Web Service gratuito)

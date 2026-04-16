@@ -1,5 +1,11 @@
 const lolApi = require('./lolApi');
 const { calculateRanking } = require('./lolPoints');
+const { normalizeMatchData } = require('./matchParser');
+const {
+  detectModeFromMatch,
+  detectModeFromActiveGame,
+  buildMatchDebugInfo,
+} = require('./matchCompatibility');
 const { createMatchResultEmbed } = require('../../utils/embedBuilder');
 const { playAudio } = require('../audio/audioService');
 const players = require('../../config/players.json');
@@ -12,11 +18,13 @@ class GameTracker {
   constructor() {
     this.currentGameId = null;
     this.currentPlayerPuuid = null;
+    this.currentActiveGameContext = null;
   }
 
   reset() {
     this.currentGameId = null;
     this.currentPlayerPuuid = null;
+    this.currentActiveGameContext = null;
   }
 
   isTracking() {
@@ -61,12 +69,20 @@ const handleActiveGame = async (client, voiceChannel, textChannelId) => {
       );
     } else {
       // Jogo terminou mas sem dados (ARAM Desordem, Arena, etc)
-      logger.warn('Jogo finalizado sem dados disponíveis (modo de evento)');
+      const activeMode = detectModeFromActiveGame(gameTracker.currentActiveGameContext);
+      logger.warn('Jogo finalizado sem dados disponíveis (modo de evento)', {
+        gameId: gameTracker.currentGameId,
+        mode: activeMode,
+        reason: gameStatus.reason,
+      });
       
       // Notifica no canal de texto
       try {
         const channel = await client.channels.fetch(textChannelId);
-        await channel.send('⚠️ Partida finalizada, mas os dados não estão disponíveis (modos de evento como ARAM Desordem e Arena não são rastreados pela API da Riot).');
+        await channel.send(
+          `⚠️ Partida finalizada sem payload completo da Riot API (${activeMode.label}). ` +
+            'Vou tentar normalmente nas próximas partidas.'
+        );
       } catch (error) {
         logger.error('Erro ao enviar notificação', error);
       }
@@ -80,12 +96,23 @@ const handleActiveGame = async (client, voiceChannel, textChannelId) => {
  */
 const searchForActiveGames = async () => {
   for (const player of players) {
-    const gameId = await lolApi.getActiveGame(player.puuid);
+    const activeGame = await lolApi.getActiveGame(player.puuid);
     
-    if (gameId) {
-      logger.info(`Jogo encontrado para ${player.name}`, { gameId });
-      gameTracker.currentGameId = gameId;
+    if (activeGame?.gameId) {
+      const activeMode = detectModeFromActiveGame(activeGame);
+
+      logger.info(`Jogo encontrado para ${player.name}`, {
+        gameId: activeGame.gameId,
+        queueId: activeGame.queueId,
+        gameMode: activeGame.gameMode,
+        gameType: activeGame.gameType,
+        mapId: activeGame.mapId,
+        detectedMode: activeMode,
+      });
+
+      gameTracker.currentGameId = activeGame.gameId;
       gameTracker.currentPlayerPuuid = player.puuid;
+      gameTracker.currentActiveGameContext = activeGame;
       break;
     }
   }
@@ -95,14 +122,21 @@ const searchForActiveGames = async () => {
  * Envia o resultado da partida para o canal
  */
 const sendMatchResult = async (client, voiceChannel, gameId, puuid, textChannelId) => {
-  const participants = await lolApi.getMatchParticipants(gameId);
+  const matchData = await lolApi.getMatchData(gameId);
+  const mode = detectModeFromMatch(matchData);
+  const parsedMatch = normalizeMatchData(matchData);
   
-  if (!participants) {
-    logger.warn('Não foi possível obter participantes da partida');
+  if (!parsedMatch?.participants?.length) {
+    logger.warn('Não foi possível obter participantes normalizados da partida', {
+      gameId,
+      mode,
+      raw: buildMatchDebugInfo(matchData),
+    });
     return;
   }
 
-  const ranking = calculateRanking(participants);
+  const participants = parsedMatch.participants;
+  const ranking = calculateRanking(participants, { modeKey: mode.key });
   const player = participants.find((p) => p.puuid === puuid);
 
   if (!player || !ranking.length) {
@@ -113,7 +147,13 @@ const sendMatchResult = async (client, voiceChannel, gameId, puuid, textChannelI
   const { embed, attachment, components } = createMatchResultEmbed(
     player.win,
     ranking,
-    ranking[0].participant.championName
+    ranking[0].participant.championName,
+    {
+      modeLabel: mode.label,
+      modeReason: mode.reason,
+      modeConfidence: mode.confidence,
+      eventLike: mode.isEventLike,
+    }
   );
 
   try {
@@ -151,20 +191,23 @@ const getLastMatch = async (playerName) => {
     return null;
   }
 
-  const lastGameId = await lolApi.getLastMatchId(player.puuid);
+  const latestSupportedMatch = await lolApi.getLastSupportedMatch(player.puuid, 10);
   
-  if (!lastGameId) {
-    logger.warn('Não foi possível obter última partida');
+  if (!latestSupportedMatch?.matchId || !latestSupportedMatch?.matchData) {
+    logger.warn('Não foi possível obter uma última partida com payload suportado');
     return null;
   }
 
-  const participants = await lolApi.getMatchParticipants(lastGameId);
+  const mode = detectModeFromMatch(latestSupportedMatch.matchData);
+  const parsedMatch = normalizeMatchData(latestSupportedMatch.matchData);
   
-  if (!participants) {
+  if (!parsedMatch?.participants?.length) {
     return null;
   }
 
-  const ranking = calculateRanking(participants);
+  const participants = parsedMatch.participants;
+
+  const ranking = calculateRanking(participants, { modeKey: mode.key });
   const playerData = participants.find((p) => p.puuid === player.puuid);
 
   if (!playerData || !ranking.length) {
@@ -174,7 +217,13 @@ const getLastMatch = async (playerName) => {
   const { embed, attachment, components } = createMatchResultEmbed(
     playerData.win,
     ranking,
-    ranking[0].participant.championName
+    ranking[0].participant.championName,
+    {
+      modeLabel: mode.label,
+      modeReason: mode.reason,
+      modeConfidence: mode.confidence,
+      eventLike: mode.isEventLike,
+    }
   );
 
   return {

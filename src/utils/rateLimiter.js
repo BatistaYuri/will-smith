@@ -18,13 +18,15 @@ class RateLimiter {
     this.processing = false;
     
     // Reset contadores
-    setInterval(() => {
+    this.secondResetTimer = setInterval(() => {
       this.requestsThisSecond = 0;
     }, 1000);
+    this.secondResetTimer.unref?.();
     
-    setInterval(() => {
+    this.twoMinResetTimer = setInterval(() => {
       this.requestsThis2Min = 0;
     }, 120000);
+    this.twoMinResetTimer.unref?.();
   }
 
   /**
@@ -62,7 +64,8 @@ class RateLimiter {
     } catch (error) {
       // Se for rate limit (429), espera mais
       if (error.response?.status === 429) {
-        const retryAfter = error.response.headers['retry-after'] || 5;
+        const headerValue = error.response.headers['retry-after'];
+        const retryAfter = Number(headerValue ?? 5);
         logger.warn(`Rate limited! Aguardando ${retryAfter}s...`);
         await new Promise(resolve => setTimeout(resolve, retryAfter * 1000));
         return this.execute(fn);

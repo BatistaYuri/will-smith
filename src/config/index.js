@@ -8,12 +8,17 @@ const fs = require('fs');
  */
 
 const isDev = process.env.NODE_ENV === 'development';
-const envFile = isDev ? '.env.development' : '.env.production';
-const envPath = path.resolve(process.cwd(), envFile);
+const envFiles = isDev
+  ? ['.env.development', 'env.development']
+  : ['.env.production', 'env.production'];
+const envFile = envFiles.find((file) =>
+  fs.existsSync(path.resolve(process.cwd(), file))
+);
+const envPath = envFile ? path.resolve(process.cwd(), envFile) : null;
 
 // Carrega o arquivo .env se existir (desenvolvimento local)
 // No Discloud, as variáveis já estão no process.env
-if (fs.existsSync(envPath)) {
+if (envPath && fs.existsSync(envPath)) {
   require('dotenv').config({ path: envPath });
   console.log(`📄 Usando: ${envFile}`);
 } else {

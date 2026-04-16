@@ -1,0 +1,122 @@
+{
+  "metadata": {
+    "matchId": "BR1_ARAM_MAYHEM_LIKE_1"
+  },
+  "info": {
+    "queueId": 1700,
+    "gameMode": "ARAM",
+    "gameType": "CUSTOM_GAME",
+    "mapId": 12,
+    "participants": [
+      {
+        "puuid": "m1",
+        "summonerName": "MayhemBlue1",
+        "championName": "Kaisa",
+        "teamId": 100,
+        "kills": 17,
+        "assists": 19,
+        "deaths": 6,
+        "win": true,
+        "playerAugment1": 101,
+        "playerAugment2": 202,
+        "augments": [202, 303]
+      },
+      {
+        "puuid": "m2",
+        "summonerName": "MayhemBlue2",
+        "championName": "Sett",
+        "teamId": 100,
+        "kills": 11,
+        "assists": 22,
+        "deaths": 9,
+        "win": true
+      },
+      {
+        "puuid": "m3",
+        "summonerName": "MayhemBlue3",
+        "championName": "Seraphine",
+        "teamId": 100,
+        "kills": 5,
+        "assists": 28,
+        "deaths": 7,
+        "win": true,
+        "perks": {
+          "styles": [
+            { "style": 8200 },
+            { "style": 8300 }
+          ]
+        }
+      },
+      {
+        "puuid": "m4",
+        "summonerName": "MayhemBlue4",
+        "championName": "Vi",
+        "teamId": 100,
+        "kills": 12,
+        "assists": 14,
+        "deaths": 11,
+        "win": true
+      },
+      {
+        "puuid": "m5",
+        "summonerName": "MayhemBlue5",
+        "championName": "Jayce",
+        "teamId": 100,
+        "kills": 10,
+        "assists": 16,
+        "deaths": 8,
+        "win": true
+      },
+      {
+        "puuid": "m6",
+        "summonerName": "MayhemRed1",
+        "championName": "Ezreal",
+        "teamId": 200,
+        "kills": 14,
+        "assists": 11,
+        "deaths": 10,
+        "win": false
+      },
+      {
+        "puuid": "m7",
+        "summonerName": "MayhemRed2",
+        "championName": "Leona",
+        "teamId": 200,
+        "kills": 4,
+        "assists": 20,
+        "deaths": 13,
+        "win": false
+      },
+      {
+        "puuid": "m8",
+        "summonerName": "MayhemRed3",
+        "championName": "Ahri",
+        "teamId": 200,
+        "kills": 9,
+        "assists": 12,
+        "deaths": 12,
+        "win": false
+      },
+      {
+        "puuid": "m9",
+        "summonerName": "MayhemRed4",
+        "championName": "Darius",
+        "teamId": 200,
+        "kills": 8,
+        "assists": 10,
+        "deaths": 13,
+        "win": false
+      },
+      {
+        "puuid": "m10",
+        "summonerName": "MayhemRed5",
+        "championName": "Vex",
+        "teamId": 200,
+        "kills": 7,
+        "assists": 13,
+        "deaths": 11,
+        "win": false
+      }
+    ]
+  }
+}

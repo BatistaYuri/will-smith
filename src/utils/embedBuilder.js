@@ -34,7 +34,7 @@ const truncate = (text, maxLength) => {
 /**
  * Cria um embed de resultado de partida - Layout Clean
  */
-const createMatchResultEmbed = (isVictory, ranking, championName) => {
+const createMatchResultEmbed = (isVictory, ranking, championName, metadata = {}) => {
 	const gifName = isVictory ? 'ganhamo.gif' : 'perdemo.gif';
 	const gifPath = path.join(MEDIA_PATHS.GIFS, gifName);
 	const attachment = new AttachmentBuilder(gifPath, { name: gifName });
@@ -56,6 +56,8 @@ const createMatchResultEmbed = (isVictory, ranking, championName) => {
 
 	// MVP
 	const mvp = ranking[0];
+	const modeLabel = metadata.modeLabel || 'Modo não identificado';
+	const partialTag = metadata.eventLike ? ' | payload parcial' : '';
 
 	const embed = new EmbedBuilder()
 		.setColor(isVictory ? COLORS.VICTORY : COLORS.DEFEAT)
@@ -64,7 +66,9 @@ const createMatchResultEmbed = (isVictory, ranking, championName) => {
 		.setThumbnail(getChampionIcon(mvp.participant.championName))
 		.setImage(`attachment://${gifName}`)
 		.setFooter({
-			text: `MVP: ${mvp.participant.riotIdGameName} (${mvp.participant.championName}) · ${mvp.total}pts`,
+			text:
+				`MVP: ${mvp.participant.riotIdGameName} (${mvp.participant.championName}) · ${mvp.total}pts` +
+				` | ${modeLabel}${partialTag}`,
 		})
 		.setTimestamp();
 
